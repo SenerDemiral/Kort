@@ -10,7 +10,7 @@
 		<h5 class="card-header">Kort Durumu & Rezervasyon</h5>
 		<div class="card-body">
 				<DxFormLayout ItemSizeMode="SizeMode.Small">
-						<DxFormLayoutItem Caption="Tarih" ColSpanMd="4">
+						<DxFormLayoutItem Caption="Tarih" ColSpanMd="3">
 								<Template>
 										<DxDateEdit @bind-Date="@Trh"
 																Format="dd.MM.yy"
@@ -19,14 +19,21 @@
 								</Template>
 						</DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Süre" ColSpanMd="4">
+						<DxFormLayoutItem Caption="Süre" ColSpanMd="3">
 								<Template>
 										<DxComboBox @bind-Value="@Sure"
 																Data="@(new int[] { 60, 90, 120 })" />
 								</Template>
 						</DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Period" ColSpanMd="4">
+						<DxFormLayoutItem Caption="Kort" ColSpanMd="3">
+								<Template>
+										<DxComboBox @bind-Value="@KkSkl"
+																Data="@(new string[] { "Açık", "Balon", "Kapalı", "Cocuk" })" />
+								</Template>
+						</DxFormLayoutItem>
+
+						<DxFormLayoutItem Caption="Period" ColSpanMd="3">
 								<Template>
 										<DxComboBox @bind-Value="@Period"
 																Data="@(new int[] { 60, 30 })" />
@@ -98,7 +105,7 @@
 		DxDataGrid<RRdrmModel> grid;
 
 		DateTime Trh = new DateTime(2020, 11, 5, 8, 0, 0);
-		string KkSkl = "A";
+		string KkSkl = "Açık";
 		int Sure = 60;
 		int Period = 60;
 
@@ -111,7 +118,7 @@
 				dynamic p = new
 				{
 						AaID = AaID,
-						KkSkl = KkSkl,
+						KkSkl = KkSkl.Substring(0,1),
 						Trh = Trh,
 						Sure = Sure,
 						Period = Period
@@ -121,23 +128,5 @@
 				data = await db.LoadData<RRdrmModel, dynamic>(sql, p);
 		}
 
-		protected override async Task OnInitializedAsync()
-		{
-				AaID = MyAppState.getAaID();
-				//string sql = $"select * from RR_BOS({AaID}, '{KkSkl}', {Trh}, {Sure}, {Period})";
-
-				dynamic p = new
-				{
-						AaID = AaID,
-						KkSkl = KkSkl,
-						Trh = Trh,
-						Sure = Sure,
-						Period = Period
-				};
-
-
-				string sql = $"select * from RR_BOS(@AaID, @KkSkl, @Trh, @Sure, @Period)";
-				//data = await db.LoadData<RRdrmModel, dynamic>(sql, p);
-		}
 
 }
