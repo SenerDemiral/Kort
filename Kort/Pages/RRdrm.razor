@@ -1,0 +1,143 @@
+﻿@page "/rrdrm"
+
+@inject NavigationManager NavigationManager
+@inject IDataAccess db
+@inject MyAppState MyAppState
+
+@*<h4><span class="badge badge-info"> Kort Durumu & Rezervasyon </span></h4>*@
+
+<div class="card">
+		<h5 class="card-header">Kort Durumu & Rezervasyon</h5>
+		<div class="card-body">
+				<DxFormLayout ItemSizeMode="SizeMode.Small">
+						<DxFormLayoutItem Caption="Tarih" ColSpanMd="4">
+								<Template>
+										<DxDateEdit @bind-Date="@Trh"
+																Format="dd.MM.yy"
+																DisplayFormat="dddd dd.MM.yy"
+																TimeSectionVisible="false"></DxDateEdit>
+								</Template>
+						</DxFormLayoutItem>
+
+						<DxFormLayoutItem Caption="Süre" ColSpanMd="4">
+								<Template>
+										<DxComboBox @bind-Value="@Sure"
+																Data="@(new int[] { 60, 90, 120 })" />
+								</Template>
+						</DxFormLayoutItem>
+
+						<DxFormLayoutItem Caption="Period" ColSpanMd="4">
+								<Template>
+										<DxComboBox @bind-Value="@Period"
+																Data="@(new int[] { 60, 30 })" />
+								</Template>
+						</DxFormLayoutItem>
+
+						<DxFormLayoutItem ColSpanMd="6">
+								<Template>
+										<DxButton RenderStyle="ButtonRenderStyle.Warning" Click="@Read" Text="Kort Durumunu Göster">
+										</DxButton>
+								</Template>
+						</DxFormLayoutItem>
+				</DxFormLayout>
+		</div>
+</div>
+
+<br />
+@*<DxToolbarItem Text="@(Trh.ToString("dd.MM.yy dddd"))"*@
+
+<DxDataGrid @ref="@grid"
+						Data="@data"
+						KeyFieldName="Trh"
+						@bind-SingleSelectedDataRow="@SelectedRow"
+						InnerComponentSizeMode="SizeMode.Small"
+						PageSize="40"
+						CssClass="MyGrid table-striped">
+		<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+						<DxToolbarItem Text='@($"{Trh:dddd dd.MM.yy}, Oyun Süresi: {Sure}dak")'
+													 CssClass="font-italic"
+													 Enabled="false" />
+						<DxToolbarItem Text="@(MyAppState.getAaAd())"
+													 BeginGroup="true"
+													 Alignment="ToolbarItemAlignment.Right"
+													 CssClass="font-italic"
+													 Enabled="false" />
+				</DxToolbar>
+		</HeaderTemplate>
+		<Columns>
+				<DxDataGridColumn Field=@nameof(RRdrmModel._TrhT)
+													TextAlignment="DataGridTextAlign.Center"
+													SortOrder="DataGridColumnSortOrder.Ascending"
+													SortIndex="1"
+													Width="4em"
+													EditorVisible="false"
+													Caption="Zaman" />
+
+				<DxDataGridSpinEditColumn Field=@nameof(RRdrmModel.NBK)
+																	TextAlignment="DataGridTextAlign.Center"
+																	Width="4em"
+																	DisplayFormat="#"
+																	EditorVisible="false"
+																	Caption="BoşKort" />
+
+				<DxDataGridColumn Field=@nameof(RRdrmModel.Info)
+													EditorVisible="false"
+													Caption="Info" />
+
+		</Columns>
+
+</DxDataGrid>
+
+
+@code {
+		private int AaID { get; set; }
+
+		List<RRdrmModel> data;
+		RRdrmModel SelectedRow;
+		DxDataGrid<RRdrmModel> grid;
+
+		DateTime Trh = new DateTime(2020, 11, 5, 8, 0, 0);
+		string KkSkl = "A";
+		int Sure = 60;
+		int Period = 60;
+
+		async Task Read()
+		{
+				AaID = MyAppState.getAaID();
+				//string sql = $"select * from RR_BOS({AaID}, '{KkSkl}', '{Trh:dd.MM.yyyy HH:mm}', {Sure}, {Period})";
+				//data = await db.LoadData<RRdrmModel, dynamic>(sql, new { });
+
+				dynamic p = new
+				{
+						AaID = AaID,
+						KkSkl = KkSkl,
+						Trh = Trh,
+						Sure = Sure,
+						Period = Period
+				};
+
+				string sql = $"select * from RR_BOS(@AaID, @KkSkl, @Trh, @Sure, @Period)";
+				data = await db.LoadData<RRdrmModel, dynamic>(sql, p);
+		}
+
+		protected override async Task OnInitializedAsync()
+		{
+				AaID = MyAppState.getAaID();
+				//string sql = $"select * from RR_BOS({AaID}, '{KkSkl}', {Trh}, {Sure}, {Period})";
+
+				dynamic p = new
+				{
+						AaID = AaID,
+						KkSkl = KkSkl,
+						Trh = Trh,
+						Sure = Sure,
+						Period = Period
+				};
+
+
+				string sql = $"select * from RR_BOS(@AaID, @KkSkl, @Trh, @Sure, @Period)";
+				//data = await db.LoadData<RRdrmModel, dynamic>(sql, p);
+		}
+
+}

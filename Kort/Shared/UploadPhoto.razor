@@ -1,0 +1,32 @@
+﻿@page "/uploadphoto"
+@inject NavigationManager NavigationManager
+
+<button type="button" id="overviewDemoSelectButton" class="btn btn-warning">Avatar Seç</button>
+<DxUpload Name="myFile"
+					Visible="@UploadVisible"
+					AcceptedFileTypes="@(new List<string> { "image/*" })"
+					ExternalSelectButtonCssSelector="#overviewDemoSelectButton"
+					MaxFileSize="100000"
+					UploadUrl="@GetUploadUrl($"api/Upload/UploadFile/{@aaid}/{@id}/")"
+					SelectedFilesChanged="@SelectedFilesChanged">
+</DxUpload>
+
+
+@code {
+		[Parameter] public int aaid { get; set; }
+		[Parameter] public int id { get; set; }
+		bool UploadVisible { get; set; } = false;
+
+		protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
+		{
+				UploadVisible = files.ToList().Count > 0;
+
+				InvokeAsync(StateHasChanged);
+		}
+		protected string GetUploadUrl(string url)
+		{
+				var aaa = NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
+				return NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
+		}
+
+}

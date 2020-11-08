@@ -1,0 +1,115 @@
+﻿@page "/uh/{UuID:int}"
+
+@inject NavigationManager NavigationManager
+@inject IDataAccess db
+@inject MyAppState MyAppState
+
+<h4><span class="badge badge-info"> Üyelik Hareketleri </span></h4>
+
+<DxDataGrid @ref="@grid"
+						Data="@data"
+						KeyFieldName="UhID"
+						@bind-SingleSelectedDataRow="@SelectedRow"
+						RowEditStart="@(dataItem => SelectedRow = dataItem)"
+						RowUpdatingAsync="@OnRowUpdating"
+						RowInsertingAsync="@OnRowInserting"
+						InitNewRow="@OnInitNewRow"
+						EditMode="DataGridEditMode.PopupEditForm"
+						InnerComponentSizeMode="SizeMode.Small"
+						PageSize="20"
+						CssClass="MyGrid table-striped">
+		<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+						<DxToolbarItem Text="@(MyAppState.getAaAd())"
+													 BeginGroup="true"
+													 Alignment="ToolbarItemAlignment.Right"
+													 CssClass="font-italic"
+													 Enabled="false" />
+				</DxToolbar>
+		</HeaderTemplate>
+		<Columns>
+				<DxDataGridCommandColumn Width="3em">
+						<HeaderCellTemplate>
+								<a class="oi oi-plus" @onclick="@(() => grid.StartRowEdit(null))" href="javascript:void(0);"></a>
+						</HeaderCellTemplate>
+						<CellTemplate>
+								<a class="oi oi-pencil" @onclick="@(() => grid.StartRowEdit(context))" href="javascript:void(0);"></a>
+								@*<a class="oi oi-x" @onclick="@(() => Delete(context as WeatherForecast))" href="javascript:void(0);"></a>*@
+						</CellTemplate>
+				</DxDataGridCommandColumn>
+
+				<DxDataGridColumn Field=@nameof(UHmodel.UhID)
+													Caption="ID"
+													Width="6em"
+													TextAlignment="DataGridTextAlign.Center"
+													EditorVisible="false"
+													AllowGroup="false" />
+
+				<DxDataGridDateEditColumn Field=@nameof(UHmodel.BasTrh)
+																	Caption="Başlangıç"
+																	Width="6em"
+																	AllowGroup="false"
+																	AllowFilter="false"
+																	DisplayFormat="dd.MM.yy"
+																	TextAlignment="DataGridTextAlign.Center" />
+				<DxDataGridDateEditColumn Field=@nameof(UHmodel.BitTrh)
+																	Caption="Bitiş"
+																	Width="6em"
+																	AllowGroup="false"
+																	AllowFilter="false"
+																	DisplayFormat="dd.MM.yy"
+																	TextAlignment="DataGridTextAlign.Center" />
+
+				<DxDataGridColumn Field=@nameof(UHmodel.Info)
+													Caption="Info"
+													EditorVisible="true"
+													AllowGroup="false" />
+
+		</Columns>
+
+</DxDataGrid>
+
+
+@code {
+		[Parameter]
+		public int UuID { get; set; }
+		private int AaID { get; set; }
+
+		List<UHmodel> data;
+		UHmodel SelectedRow;
+		DxDataGrid<UHmodel> grid;
+
+		private int GroupIndex { get; set; } = -1;
+
+		protected override async Task OnInitializedAsync()
+		{
+				AaID = MyAppState.getAaID();
+				string sql = $"select * from UH where AaID = {AaID} and UuID = {UuID}";
+				data = await db.LoadData<UHmodel, dynamic>(sql, new { });
+		}
+
+		async Task OnRowUpdating(UHmodel dataItem, IDictionary<string, object> newValue)
+		{
+				await db.UpdateRec(dataItem, newValue);
+		}
+
+		Task OnInitNewRow(Dictionary<string, object> values)
+		{
+				// values.Add("DgmTrh", DateTime.Today);
+				return Task.CompletedTask;
+		}
+
+		async Task OnRowInserting(IDictionary<string, object> newValue)
+		{
+				if (newValue.Count > 0)
+				{
+						newValue.Add("AaID", AaID);
+						newValue.Add("UuID", UuID);
+						var dataItem = await db.InsertRec<UHmodel>(newValue);
+						data.Add(dataItem);
+						SelectedRow = dataItem;
+						await InvokeAsync(StateHasChanged);
+				}
+		}
+
+}

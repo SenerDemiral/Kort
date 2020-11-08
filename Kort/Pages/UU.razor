@@ -1,0 +1,549 @@
+﻿@page "/uu"
+
+@inject NavigationManager NavigationManager
+@inject IDataAccess db
+@inject MyAppState MyAppState
+@using System.Text.Json;
+@using System.Globalization;
+
+<h4><span class="badge badge-info"> Kişiler </span></h4>
+
+
+<DxDataGrid @ref="@grid"
+						Data="@data"
+						KeyFieldName="UuID"
+						@bind-SingleSelectedDataRow="@SelectedRow"
+						EditMode="DataGridEditMode.EditForm"
+						RowEditStart="@(dataItem => OnRowEditStarting(dataItem))"
+						RowInsertStart="@(() => OnRowEditStarting(null))"
+						RowEditCancel="@(() => ChangeToolbarEnabled(true))"
+						ShowPager="true"
+						PagerPageSizeSelectorVisible="true"
+						PagerAllDataRowsItemVisible="false"
+						PagerAllowedPageSizes=@(new int[] {5,10,20,40,100})
+						PageSize="5"
+						PageIndex="@PageIndex"
+						PageIndexChanged="@OnPageIndexChanged"
+						PagerNavigationMode=PagerNavigationMode.InputBox
+						HtmlRowDecoration="@OnHtmlRowDecoration"
+						HtmlDataCellDecoration="@OnHtmlDataCellDecoration"
+						SelectionMode="DataGridSelectionMode.SingleSelectedDataRow"
+						ShowGroupPanel="true"
+						ShowDetailRow="true"
+						ShowFilterRow="@ShowFilterRow"
+						InnerComponentSizeMode="SizeMode.Small"
+						CssClass="MyGrid">
+
+		<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+						<DxToolbarItem Text="Filter Row"
+													 BeginGroup="true"
+													 Click="@((ToolbarItemClickEventArgs e) => ShowFilterRow = !ShowFilterRow)"
+													 IconCssClass="oi oi-eye"
+													 Enabled="@Enabled" />
+						<DxToolbarItem Text="@(MyAppState.getAaAd())"
+													 BeginGroup="true"
+													 Alignment="ToolbarItemAlignment.Right"
+													 CssClass="font-italic"
+													 Enabled="false" />
+				</DxToolbar>
+		</HeaderTemplate>
+
+		<Columns>
+				<DxDataGridCommandColumn Width="3em">
+						<HeaderCellTemplate>
+								<a class="oi oi-plus" @onclick="@(() => grid.StartRowEdit(null))" href="javascript:void(0);"></a>
+						</HeaderCellTemplate>
+						<CellTemplate>
+								<a class="oi oi-pencil" @onclick="@(() => grid.StartRowEdit(context))" href="javascript:void(0);"></a>
+						</CellTemplate>
+				</DxDataGridCommandColumn>
+
+
+				<DxDataGridColumn Field=@nameof(UUmodel.UuID)
+													Caption="ID"
+													Width="6em"
+													TextAlignment="DataGridTextAlign.Center"
+													AllowGroup="false"
+													EditorVisible="false">
+				</DxDataGridColumn>
+
+				<DxDataGridColumn Field=@nameof(UUmodel.UuID)
+													Caption="H"
+													Width="3em"
+													TextAlignment="DataGridTextAlign.Center"
+													AllowFilter="false"
+													AllowGroup="false"
+													EditorVisible="false">
+						<DisplayTemplate>
+								@{
+										int id = (context as UUmodel).UuID;
+										<NavLink class="navbar-dark" href="@($"uh/{id}")">
+												<span class="badge badge-primary">H</span>
+										</NavLink>
+								}
+						</DisplayTemplate>
+				</DxDataGridColumn>
+
+				<DxDataGridDateEditColumn Field=@nameof(UUmodel.EXD)
+																	Caption="Kayıt"
+																	Width="6em"
+																	AllowGroup="false"
+																  AllowFilter="false"
+																	DisplayFormat="dd.MM.yy"
+																	TextAlignment="DataGridTextAlign.Center" />
+
+
+				<DxDataGridComboBoxColumn Field=@nameof(UUmodel.Skl)
+																	Caption="Şkl"
+																	Width="10em"
+																	TextFieldName="Ad"
+																	ValueFieldName="Skl"
+																	ListRenderMode="ListRenderMode.Virtual"
+																	Data="@db.UuSklList()">
+				</DxDataGridComboBoxColumn>
+
+				<DxDataGridColumn Field=@nameof(UUmodel.Ad)
+													Caption="Ad"
+													AllowGroup="false" />
+
+				<DxDataGridColumn Field=@nameof(UUmodel.Sex)
+													Caption="Sex"
+													Width="4em"
+													TextAlignment="DataGridTextAlign.Center"
+													AllowGroup="true" />
+
+				<DxDataGridDateEditColumn Field=@nameof(UUmodel.DgmTrh)
+																	Caption="DğmTrh"
+																	Width="6em"
+																	AllowGroup="false"
+																	AllowFilter="false"
+																	DisplayFormat="dd.MM.yyyy"
+																	TextAlignment="DataGridTextAlign.Center" />
+		</Columns>
+
+		<TotalSummary>
+				<DxDataGridSummaryItem ShowInColumn=@nameof(UUmodel.Ad)
+															 DisplayFormat="{0:d} Kişi"
+															 SummaryType=SummaryItemType.Count />
+		</TotalSummary>
+
+		<GroupSummary>
+				<DxDataGridSummaryItem SummaryType=SummaryItemType.Count
+															 DisplayFormat="{0:d}"
+															 GroupSummaryPosition="GroupSummaryPosition.GroupRow" />
+		</GroupSummary>
+
+		<DetailRowTemplate>
+				<div>
+						<table cellpadding="5" cellspacing="0">
+								<tbody>
+										<tr>
+												<td class="MyDetailRowLabel">Tel</td>
+												<td style="width:8rem">@context.Tel1</td>
+
+												<td class="MyDetailRowLabel">Mail Adresi</td>
+												<td style="width:20rem">@context.Mail1</td>
+
+												<td rowspan="2" style="width:6rem">
+														<DxCheckBox LabelPosition="LabelPosition.Left"
+																				Alignment="CheckBoxContentAlignment.Center"
+																				Enabled="false"
+																				ValueUnchecked="0"
+																				ValueChecked="1"
+																				ValueIndeterminate="-1"
+																				CssClass="MyDetailRowLabel"
+																				@bind-Checked="@context.MailOK">
+																Mail?
+														</DxCheckBox>
+												</td>
+												<td rowspan="2" style="width:6rem">
+														<DxCheckBox LabelPosition="LabelPosition.Left"
+																				Alignment="CheckBoxContentAlignment.Center"
+																				Enabled="false"
+																				ValueUnchecked="0"
+																				ValueChecked="1"
+																				ValueIndeterminate="-1"
+																				CssClass="MyDetailRowLabel"
+																				@bind-Checked="@context.SmsOK">
+																SMS?
+														</DxCheckBox>
+												</td>
+										</tr>
+										<tr>
+												<td class="MyDetailRowLabel">Tel2</td>
+												<td style="width:8rem">@context.Tel2</td>
+
+												<td class="MyDetailRowLabel">Mail Adresi2</td>
+												<td style="width:20rem">@context.Mail2</td>
+
+										</tr>
+								</tbody>
+						</table>
+				</div>
+				<div class="mt-1" style="display:grid; grid-template-columns: 80px 1fr">
+						<img src="uploads/@(context.AaID)/@(context.UuID).jpg" style="max-width:76px; max-height:100px; height:auto; width:auto;" />
+						<DxMemo @bind-Text="@context.Info"
+										Rows="5"
+										ReadOnly="true"
+										ResizeMode="MemoResizeMode.VerticalAndHorizontal" />
+				</div>
+				@if (context.Skl == "G")
+				{
+				<DxTagBox Data="@data"
+									TextFieldName="Ad"
+									ValueFieldName="IDS"
+									@bind-Values="@context.SelectedUuIDs"
+									Enabled="false"
+									ListRenderMode="ListRenderMode.Virtual"
+									ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+				</DxTagBox>
+				}
+				<DxTagBox Data="@TgData"
+									TextFieldName="@nameof(TGmodel.Ad)"
+									ValueFieldName="@nameof(TGmodel.IDS)"
+									@bind-Values="@context.SelectedTGs"
+									Enabled="false"
+									ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+				</DxTagBox>
+
+		</DetailRowTemplate>
+
+		<EditFormTemplate>
+				<EditForm Model="@EditContext" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit">
+						<DataAnnotationsValidator />
+						<DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+
+								<DxFormLayoutItem Caption="Şkl" ColSpanMd="4" Context="FormLayoutContext">
+										<Template>
+												<DxComboBox @bind-Value="@EditContext.Skl"
+																		TextFieldName="Ad"
+																		ValueFieldName="Skl"
+																		Data="@db.UuSklList()" />
+										</Template>
+								</DxFormLayoutItem>
+
+								<DxFormLayoutItem Caption="Ad" ColSpanMd="4" Context="FormLayoutContext" BeginRow="true">
+										<Template>
+												<DxTextBox @bind-Text="@EditContext.Ad" />
+										</Template>
+								</DxFormLayoutItem>
+
+								<DxFormLayoutItem Caption="Cinsiyet" ColSpanMd="2" Context="FormLayoutContext">
+										<Template>
+												<DxComboBox @bind-Value="@EditContext.Sex"
+																		Data="@(new string[] { "E", "K" })" />
+										</Template>
+								</DxFormLayoutItem>
+
+								<DxFormLayoutItem Caption="DğmTrh" ColSpanMd="2" Context="FormLayoutContext">
+										<Template>
+												<DxDateEdit @bind-Date="@EditContext.DgmTrh"
+																		PickerDisplayMode="@DatePickerDisplayMode.ScrollPicker"
+																		ScrollPickerFormat="dd MMM yyyy"
+																		Format="dd.MM.yyyy"
+																		DisplayFormat="dd.MM.yyyy" />
+										</Template>
+								</DxFormLayoutItem>
+
+								<DxFormLayoutItem Caption="Tel" ColSpanMd="2" Context="FormLayoutContext" BeginRow="true">
+										<Template>
+												<DxTextBox @bind-Text="@EditContext.Tel1" />
+										</Template>
+								</DxFormLayoutItem>
+								<DxFormLayoutItem Caption="eMail" ColSpanMd="4" Context="FormLayoutContext">
+										<Template>
+												<DxTextBox @bind-Text="@EditContext.Mail1" />
+										</Template>
+								</DxFormLayoutItem>
+								<DxFormLayoutItem Caption="MailOK" ColSpanMd="2" Context="FormLayoutContext">
+										<Template>
+												<DxCheckBox @bind-Checked="@EditContext.MailOK"
+																		ValueChecked="1" ValueUnchecked="0" ValueIndeterminate="-1" />
+										</Template>
+								</DxFormLayoutItem>
+								<DxFormLayoutItem Caption="SmsOK" ColSpanMd="2" Context="FormLayoutContext">
+										<Template>
+												<DxCheckBox @bind-Checked="@EditContext.SmsOK" AllowIndeterminateStateByClick="false"
+																		ValueChecked="1" ValueUnchecked="0" ValueIndeterminate="-1" />
+										</Template>
+								</DxFormLayoutItem>
+
+								<DxFormLayoutItem Caption="Tel2" ColSpanMd="2" Context="FormLayoutContext" BeginRow="true">
+										<Template>
+												<DxTextBox @bind-Text="@EditContext.Tel2" />
+										</Template>
+								</DxFormLayoutItem>
+								<DxFormLayoutItem Caption="eMail2" ColSpanMd="4" Context="FormLayoutContext">
+										<Template>
+												<DxTextBox @bind-Text="@EditContext.Mail2" />
+										</Template>
+								</DxFormLayoutItem>
+
+								@if (EditContext.UuID > 0)
+								{
+										<DxFormLayoutItem Caption="Photo" ColSpanMd="2" Context="FormLayoutContext">
+												<Template>
+														@if (EditContext.UuID > 0)
+														{
+																<UploadPhoto aaid="@EditContext.AaID" id="@EditContext.UuID" />
+														}
+												</Template>
+										</DxFormLayoutItem>
+								}
+
+								<DxFormLayoutItem Caption="Info" ColSpanMd="12" Context="FormLayoutContext" BeginRow="true">
+										<Template>
+												<DxMemo @bind-Text="@EditContext.Info"
+																Rows="5"
+																ResizeMode="MemoResizeMode.VerticalAndHorizontal"
+																ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+										</Template>
+								</DxFormLayoutItem>
+								@if (EditContext.Skl == "G")
+								{
+										<DxFormLayoutItem Caption="Grup Kişileri" ColSpanMd="12" Context="FormLayoutContext">
+												<Template>
+														<DxTagBox Data="@data"
+																			TextFieldName="Ad"
+																			ValueFieldName="IDS"
+																			@bind-Values="@(EditContext.SelectedUuIDs)"
+																			ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+														</DxTagBox>
+												</Template>
+										</DxFormLayoutItem>
+								}
+								<DxFormLayoutItem Caption="Etiketler" ColSpanMd="12" Context="FormLayoutContext">
+										<Template>
+												<DxTagBox Data="@TgData"
+																	TextFieldName="Ad"
+																	ValueFieldName="IDS"
+																	@bind-Values="@(EditContext.SelectedTGs)"
+																	ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+												</DxTagBox>
+										</Template>
+								</DxFormLayoutItem>
+
+								<DxFormLayoutItem ColSpanMd="12" Context="FormLayoutContext">
+										<Template>
+												<ValidationSummary />
+										</Template>
+								</DxFormLayoutItem>
+
+								<DxFormLayoutItem ColSpanMd="12" Context="FormLayoutContext">
+										<Template>
+												<div class="text-right">
+														<DxButton RenderStyle="@ButtonRenderStyle.Link" SubmitFormOnClick="true" Text="Update" />
+														<DxButton RenderStyle="@ButtonRenderStyle.Link" @onclick="@OnCancelButtonClick" Text="Cancel" />
+												</div>
+										</Template>
+								</DxFormLayoutItem>
+
+						</DxFormLayout>
+				</EditForm>
+		</EditFormTemplate>
+
+</DxDataGrid>
+
+<DxFormLayout CaptionPosition="CaptionPosition.Vertical">
+		<DxFormLayoutItem Caption="Etiket ara" ColSpanMd="8">
+				<Template>
+						<DxTagBox Data="@TgData"
+											TextFieldName="@nameof(TGmodel.Ad)"
+											ValueFieldName="@nameof(TGmodel.IDS)"
+											@bind-Values="FilteredTGs"
+											ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+						</DxTagBox>
+				</Template>
+		</DxFormLayoutItem>
+
+		<DxFormLayoutItem Caption=" " ColSpanMd="4">
+				<Template>
+						<button class="btn btn-primary" type="button" @onclick="@OnTgFilterClick">OK</button>
+				</Template>
+		</DxFormLayoutItem>
+</DxFormLayout>
+
+
+@code {
+		List<UUmodel> data;
+		DxDataGrid<UUmodel> grid;
+		bool Enabled = true;
+		bool ShowFilterRow = false;
+		//KTmodel SelectedRow;
+		int AaID = -1;
+
+		int PageIndex { get; set; } = 0;
+
+		UUmodel selectedRow;
+		public UUmodel SelectedRow
+		{
+				get { return selectedRow; }
+				set
+				{
+						selectedRow = value;
+						MyAppState.curUuID = selectedRow.UuID;
+						//InvokeAsync(StateHasChanged);
+				}
+		}
+
+		FormEditContext EditContext = null;
+
+		List<TGmodel> TgData;
+		IEnumerable<string> FilteredTGs { get; set; } // = new List<string>();
+
+		void OnPageIndexChanged(int newPageIndex)
+		{
+				MyAppState.curUuPageIndex = newPageIndex;
+		}
+
+		async Task OnTgFilterClick()
+		{
+				string filter = "";
+
+				if (FilteredTGs?.Count() > 0)
+						filter = string.Join(',', FilteredTGs);
+
+				string sql = $"select * from UU_S({AaID}, '{filter}')";
+				data = await db.LoadData<UUmodel, dynamic>(sql, new { });
+		}
+
+		protected override async Task OnInitializedAsync()
+		{
+				AaID = MyAppState.getAaID();
+
+				string sql = $"select * from UU where AaID = {AaID}";
+				data = await db.LoadData<UUmodel, dynamic>(sql, new { });
+
+				TgData = await db.LoadData<TGmodel, dynamic>($"select * from TG where AaID = {AaID} and Skl = 'K' order by Ad", new { });
+		}
+
+		protected override void OnAfterRender(bool firstRender)
+		{
+				if (firstRender)
+				{
+						PageIndex = MyAppState.curUuPageIndex;
+						if (MyAppState.curUuID > 0)
+								grid.SetDataRowSelectedByKey(MyAppState.curUuID, true);
+				}
+		}
+
+		void ChangeToolbarEnabled(bool enabled)
+		{
+				Enabled = enabled;
+				InvokeAsync(StateHasChanged);
+		}
+
+		void OnRowEditStarting(UUmodel curRow)
+		{
+				ChangeToolbarEnabled(false);
+
+				if (curRow == null)   // Insert
+				{
+						EditContext = new FormEditContext(null);
+				}
+				else
+				{
+						// Copy curRow to EditContext & EditContext.DataItem
+						SelectedRow = curRow;
+						string jsonString = JsonSerializer.Serialize(curRow);
+						EditContext = JsonSerializer.Deserialize<FormEditContext>(jsonString);
+						EditContext.DataItem = curRow;
+				}
+
+				//EditContext = new FormEditContext(dataItem);
+
+				EditContext.StateHasChanged += () =>
+				{
+						InvokeAsync(StateHasChanged);
+				};
+		}
+
+		void OnCancelButtonClick()
+		{
+				EditContext = null;
+				grid.CancelRowEdit();
+		}
+
+		async Task HandleValidSubmit()
+		{
+				Dictionary<string, object> newValue = new Dictionary<string, object>();
+
+				// edtCtx -> oldRow and add to newValue
+				db.MyTableFieldsCopy<FormEditContext, UUmodel>(EditContext, EditContext.DataItem, newValue);
+
+				if (EditContext.IsNewRow)
+				{
+						newValue.Add("AaID", AaID);
+						var newRow = await db.InsertRec<UUmodel>(newValue);
+						data.Add(newRow);
+						SelectedRow = newRow;
+				}
+				else
+						await db.UpdateRec(SelectedRow, newValue);
+
+				EditContext = null;
+				await grid.CancelRowEdit();
+
+				//await ReadSelectedRow();
+				//var rec = await db.LoadRec<KTmodel, dynamic>("select EXD, Yas from KT where KtID = @KtID", new { KtID = SelectedRow.KtID });
+				await grid.Refresh();
+		}
+
+		void OnHtmlRowDecoration(DataGridHtmlRowDecorationEventArgs<UUmodel> eventArgs)
+		{
+				if (eventArgs is DataGridHtmlGroupRowDecorationEventArgs<UUmodel> groupEventArgs)
+				{
+						//if (groupEventArgs.Expanded)
+						groupEventArgs.CssClass += " font-weight-bold text-danger";
+				}
+				else
+				{
+						switch (eventArgs.RowType)
+						{
+								case DataGridHtmlRowDecorationType.DataRow:
+										break;
+								case DataGridHtmlRowDecorationType.EditFormRow:
+										eventArgs.CssClass += " EditForm HidePreview";
+										// eventArgs.Style = " background-color:azure;";
+										//eventArgs.Attributes.Add("data-editform", "aaaaa");
+										break;
+								default:
+										eventArgs.CssClass += " table-reflow";
+										break;
+						}
+				}
+		}
+
+		void OnHtmlDataCellDecoration(DataGridHtmlDataCellDecorationEventArgs<UUmodel> eventArgs)
+		{
+				if (eventArgs.FieldName == nameof(UUmodel.Ad))
+				{
+						//eventArgs.Style += " font-weight:500;";
+						eventArgs.CssClass += " font-weight-bold";
+				}
+		}
+
+		class FormEditContext : UUmodel
+		{
+				public UUmodel DataItem { get; set; }
+				public bool IsNewRow { get; set; }
+				public Action StateHasChanged { get; set; }
+
+				public FormEditContext()    // jsonDeserialize icin gerekli
+				{
+				}
+
+				public FormEditContext(UUmodel dataItem)
+				{
+						DataItem = dataItem;
+						if (DataItem == null)
+						{
+								DataItem = new UUmodel();
+								IsNewRow = true;
+						}
+				}
+		}
+
+
+}

@@ -1,0 +1,49 @@
+﻿@inject MyAppState MyAppState
+@implements IDisposable
+
+
+<DxTreeView AllowSelectNodes="true" CssClass="app-sidebar" @key="@usrID">
+		<Nodes>
+				<DxTreeViewNode NavigateUrl="" Text="" IconCssClass="oi oi-home mb-0"></DxTreeViewNode>
+				@if (usrID > 0)
+				{
+						<DxTreeViewNode NavigateUrl="rrdrm" Text="Kort Durumu" BadgeText="D"></DxTreeViewNode>
+						@if (usrSkl == "A")
+						{
+								<DxTreeViewNode NavigateUrl="aa" Text="Klüp" BadgeText="A"></DxTreeViewNode>
+								<DxTreeViewNode NavigateUrl="uu" Text="Kişiler" BadgeText="U"></DxTreeViewNode>
+								<DxTreeViewNode NavigateUrl="rr" Text="Rezervasyon" BadgeText="R"></DxTreeViewNode>
+								<DxTreeViewNode NavigateUrl="tg" Text="Etiketler" BadgeText="E"></DxTreeViewNode>
+								<DxTreeViewNode NavigateUrl="kk" Text="Kortlar" BadgeText="K"></DxTreeViewNode>
+						}
+				}
+		</Nodes>
+</DxTreeView>
+
+@code{
+		private int usrID = 0;  // DxTreeView daki @key dikkat baska turlu refresh olmuyor, dolayisiyla usrID degistiginde refresh oluyor
+		private string usrSkl = "";
+		protected override void OnInitialized()
+		{
+				// Subscribe to the StateChanged EventHandler
+				MyAppState.StateChanged += OnMyStateStateChanged;
+				usrID = MyAppState.getUsrID();
+				usrSkl = MyAppState.getUsrSkl();
+		}
+
+		void OnMyStateStateChanged(object sender, EventArgs e)
+		{
+				usrID = MyAppState.getUsrID();
+				//StateHasChanged();
+				InvokeAsync(StateHasChanged);
+		}
+
+		void IDisposable.Dispose()
+		{
+				// When this control is disposed of
+				// unsubscribe from the StateChanged EventHandler
+				MyAppState.StateChanged -= OnMyStateStateChanged;
+		}
+
+
+}

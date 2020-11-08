@@ -1,0 +1,156 @@
+﻿@page "/rr"
+
+@inject NavigationManager NavigationManager
+@inject IDataAccess db
+@inject MyAppState MyAppState
+
+<h4><span class="badge badge-info"> Rezervasyonlar </span></h4>
+
+<DxDataGrid @ref="@grid"
+						Data="@data"
+						KeyFieldName="RrID"
+						@bind-SingleSelectedDataRow="@SelectedRow"
+						RowEditStart="@(dataItem => SelectedRow = dataItem)"
+						RowUpdatingAsync="@OnRowUpdating"
+						RowInsertingAsync="@OnRowInserting"
+						InitNewRow="@OnInitNewRow"
+						EditMode="DataGridEditMode.PopupEditForm"
+						InnerComponentSizeMode="SizeMode.Small"
+ 					  ShowGroupPanel="true"
+
+						PageSize="20"
+						CssClass="MyGrid table-striped">
+		<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+						<DxToolbarItem Text="@(MyAppState.getAaAd())"
+													 BeginGroup="true"
+													 Alignment="ToolbarItemAlignment.Right"
+													 CssClass="font-italic"
+													 Enabled="false" />
+				</DxToolbar>
+		</HeaderTemplate>
+		<Columns>
+				<DxDataGridCommandColumn Width="3em">
+						<HeaderCellTemplate>
+								<a class="oi oi-plus" @onclick="@(() => grid.StartRowEdit(null))" href="javascript:void(0);"></a>
+						</HeaderCellTemplate>
+						<CellTemplate>
+								<a class="oi oi-pencil" @onclick="@(() => grid.StartRowEdit(context))" href="javascript:void(0);"></a>
+								@*<a class="oi oi-x" @onclick="@(() => Delete(context as WeatherForecast))" href="javascript:void(0);"></a>*@
+						</CellTemplate>
+				</DxDataGridCommandColumn>
+
+				<DxDataGridColumn Field=@nameof(RRmodel.RrID)
+													Caption="ID"
+													Width="6em"
+													TextAlignment="DataGridTextAlign.Center"
+													EditorVisible="false"
+													AllowGroup="false" />
+
+				<DxDataGridColumn Field=@nameof(RRmodel.UuID)
+													Caption="User"
+													Width="6em"
+													TextAlignment="DataGridTextAlign.Center"
+													EditorVisible="false"
+													AllowGroup="false" />
+
+				<DxDataGridDateEditColumn Field=@nameof(RRmodel.EXD)
+																	TextAlignment="DataGridTextAlign.Center"
+																	Caption="RzrvTrh"
+																	Width="10em"
+																	EditorVisible="false"
+																	DisplayFormat="dd.MM.yy HH:mm:ss" />
+
+				<DxDataGridColumn Field=@nameof(RRmodel.KkSkl)
+													Caption="Kort"
+													Width="6em"
+													TextAlignment="DataGridTextAlign.Center"
+													EditorVisible="false"
+													AllowGroup="false" />
+
+				<DxDataGridDateEditColumn Field=@nameof(RRmodel._BasTrhD)
+																	TextAlignment="DataGridTextAlign.Center"
+																	SortOrder="DataGridColumnSortOrder.Descending"
+																	SortIndex="0"
+																	Caption="Trh"
+																	GroupIndex="0"
+																	Width="6em"
+																	EditorVisible="false"
+																	DisplayFormat="dd.MM.yy dddd" />
+
+				<DxDataGridColumn Field=@nameof(RRmodel._BasTrhT)
+													TextAlignment="DataGridTextAlign.Center"
+													SortOrder="DataGridColumnSortOrder.Ascending"
+													SortIndex="1"
+													Width="4em"
+													EditorVisible="false"
+													Caption="Baş" />
+
+				<DxDataGridColumn Field=@nameof(RRmodel.Sure)
+													TextAlignment="DataGridTextAlign.Center"
+													Width="4em"
+													EditorVisible="false"
+													Caption="SüreDk" />
+
+				<DxDataGridColumn Field=@nameof(RRmodel._BitTrhT)
+													TextAlignment="DataGridTextAlign.Center"
+													Width="4em"
+													EditorVisible="false"
+													Caption="Bit" />
+
+				<DxDataGridColumn Field=@nameof(RRmodel.Info)
+													Caption="Info"
+													EditorVisible="true"
+													AllowGroup="false" />
+
+				<DxDataGridColumn Field=@nameof(RRmodel.UuADs)
+													Caption="Oyuncular"
+													EditorVisible="false"
+													AllowGroup="false" />
+		</Columns>
+
+</DxDataGrid>
+
+
+@code {
+		[Parameter]
+		public int UuID { get; set; }
+		private int AaID { get; set; }
+
+		List<RRmodel> data;
+		RRmodel SelectedRow;
+		DxDataGrid<RRmodel> grid;
+
+		private int GroupIndex { get; set; } = -1;
+
+		protected override async Task OnInitializedAsync()
+		{
+				AaID = MyAppState.getAaID();
+				string sql = $"select * from RR_S({AaID})";
+				data = await db.LoadData<RRmodel, dynamic>(sql, new { });
+		}
+
+		async Task OnRowUpdating(RRmodel dataItem, IDictionary<string, object> newValue)
+		{
+				await db.UpdateRec(dataItem, newValue);
+		}
+
+		Task OnInitNewRow(Dictionary<string, object> values)
+		{
+				// values.Add("DgmTrh", DateTime.Today);
+				return Task.CompletedTask;
+		}
+
+		async Task OnRowInserting(IDictionary<string, object> newValue)
+		{
+				if (newValue.Count > 0)
+				{
+						newValue.Add("AaID", AaID);
+						var dataItem = await db.InsertRec<RRmodel>(newValue);
+						data.Add(dataItem);
+						SelectedRow = dataItem;
+						await InvokeAsync(StateHasChanged);
+				}
+		}
+
+}

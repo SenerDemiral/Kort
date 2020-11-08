@@ -1,0 +1,132 @@
+﻿@page "/kk"
+
+@inject NavigationManager NavigationManager
+@inject IDataAccess db
+@inject MyAppState MyAppState
+
+<h4><span class="badge badge-info"> Kortlar </span></h4>
+
+<DxDataGrid @ref="@grid"
+						Data="@data"
+						KeyFieldName="KkID"
+						@bind-SingleSelectedDataRow="@SelectedRow"
+						RowEditStart="@(dataItem => SelectedRow = dataItem)"
+						RowUpdatingAsync="@OnRowUpdating"
+						RowInsertingAsync="@OnRowInserting"
+						InitNewRow="@OnInitNewRow"
+						ShowFilterRow="@ShowFilterRow"
+						EditMode="DataGridEditMode.PopupEditForm"
+						InnerComponentSizeMode="SizeMode.Small"
+						ShowGroupPanel="true"
+						ShowPager="true"
+						PagerPageSizeSelectorVisible="true"
+						PagerAllDataRowsItemVisible="true"
+						PageSize="20"
+						PagerAllowedPageSizes=@(new int[] { 5, 10, 20, 40 })
+						PagerNavigationMode=PagerNavigationMode.InputBox
+						CssClass="MyGrid table-striped">
+		<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+						<DxToolbarItem Text="Filter Row"
+													 BeginGroup="true"
+													 GroupName="FilterRow"
+													 Click="@OnShowFilterRow"
+													 IconCssClass="oi oi-eye" />
+						<DxToolbarItem Text="@(MyAppState.getAaAd())"
+													 BeginGroup="true"
+													 Alignment="ToolbarItemAlignment.Right"
+													 CssClass="font-italic"
+													 Enabled="false" />
+				</DxToolbar>
+		</HeaderTemplate>
+		<Columns>
+				<DxDataGridCommandColumn Width="3em">
+						<HeaderCellTemplate>
+								<a class="oi oi-plus" @onclick="@(() => grid.StartRowEdit(null))" href="javascript:void(0);"></a>
+						</HeaderCellTemplate>
+						<CellTemplate>
+								<a class="oi oi-pencil" @onclick="@(() => grid.StartRowEdit(context))" href="javascript:void(0);"></a>
+								@*<a class="oi oi-x" @onclick="@(() => Delete(context as WeatherForecast))" href="javascript:void(0);"></a>*@
+						</CellTemplate>
+				</DxDataGridCommandColumn>
+
+				<DxDataGridColumn Field=@nameof(KKmodel.KkID)
+													Caption="ID"
+													Width="6em"
+                          TextAlignment="DataGridTextAlign.Center"
+													EditorVisible="false"
+													AllowGroup="false" />
+
+				<DxDataGridComboBoxColumn Field=@nameof(KKmodel.Skl)
+																	Caption="Şkl"
+																	Width="10em"
+																	SortOrder="DataGridColumnSortOrder.Ascending"
+																	SortIndex="0"
+																	GroupIndex="@GroupIndex"
+				                          TextAlignment="DataGridTextAlign.Center"
+																	TextFieldName="Ad"
+																	ValueFieldName="Skl"
+																	Data="@db.KkSklList()">
+				</DxDataGridComboBoxColumn>
+
+				<DxDataGridColumn Field=@nameof(KKmodel.Ad)
+													Caption="Ad"
+													EditorVisible="true"
+													AllowGroup="false" />
+
+		</Columns>
+
+</DxDataGrid>
+
+
+@code {
+		private int AaID { get; set; }
+		private int UuID { get; set; }
+		private string UuSkl { get; set; }
+
+		List<KKmodel> data;
+		KKmodel SelectedRow;
+		DxDataGrid<KKmodel> grid;
+		bool ShowFilterRow = false;
+		//public List<SexModel> SexList { get; set; }
+		//private List<SexModel> SexList { get { return db.SexList(); } }
+		//private List<KTmodel> KtList { get; set; }
+		//private List<KTSLmodel> KtLookup { get; set; }
+
+		private int GroupIndex { get; set; } = -1;
+
+		void OnShowFilterRow(ToolbarItemClickEventArgs e)
+		{
+				ShowFilterRow = !ShowFilterRow;
+		}
+		protected override async Task OnInitializedAsync()
+		{
+				AaID = MyAppState.getAaID();
+				string sql = $"select * from KK where AaID = {AaID}";
+				data = await db.LoadData<KKmodel, dynamic>(sql, new { });
+		}
+
+		async Task OnRowUpdating(KKmodel dataItem, IDictionary<string, object> newValue)
+		{
+				await db.UpdateRec(dataItem, newValue);
+		}
+
+		Task OnInitNewRow(Dictionary<string, object> values)
+		{
+				// values.Add("DgmTrh", DateTime.Today);
+				return Task.CompletedTask;
+		}
+
+		async Task OnRowInserting(IDictionary<string, object> newValue)
+		{
+				if (newValue.Count > 0)
+				{
+						newValue.Add("AaID", AaID);
+						var dataItem = await db.InsertRec<KKmodel>(newValue);
+						data.Add(dataItem);
+						SelectedRow = dataItem;
+						await InvokeAsync(StateHasChanged);
+				}
+		}
+
+}

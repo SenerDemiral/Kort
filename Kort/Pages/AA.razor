@@ -1,0 +1,160 @@
+﻿@page "/aa"
+
+@inject NavigationManager NavigationManager
+@inject IDataAccess db
+@inject MyAppState MyAppState
+
+<h4><span class="badge badge-info"> Klüp </span></h4>
+
+<DxDataGrid @ref="@grid"
+						Data="@data"
+						KeyFieldName="AaID"
+						@bind-SingleSelectedDataRow="@SelectedRow"
+						RowEditStart="@(dataItem => SelectedRow = dataItem)"
+						RowUpdatingAsync="@OnRowUpdating"
+						RowInsertingAsync="@OnRowInserting"
+						InitNewRow="@OnInitNewRow"
+						EditMode="DataGridEditMode.PopupEditForm"
+						InnerComponentSizeMode="SizeMode.Small"
+						CssClass="MyGrid">
+		<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+						<DxToolbarItem Text="@(MyAppState.getAaAd())"
+													 BeginGroup="true"
+													 Alignment="ToolbarItemAlignment.Right"
+													 CssClass="font-italic"
+													 Enabled="false" />
+				</DxToolbar>
+		</HeaderTemplate>
+		<Columns>
+				<DxDataGridCommandColumn Width="3em">
+						<HeaderCellTemplate />
+						<CellTemplate>
+								<a class="oi oi-pencil" @onclick="@(() => grid.StartRowEdit(context))" href="javascript:void(0);"></a>
+						</CellTemplate>
+				</DxDataGridCommandColumn>
+
+				<DxDataGridColumn Field=@nameof(AAmodel.AaID)
+													Caption="ID"
+													Width="6em"
+													TextAlignment="DataGridTextAlign.Center"
+													EditorVisible="false"
+													AllowGroup="false" />
+
+
+				<DxDataGridColumn Field=@nameof(AAmodel.Ad)
+													Caption="Ad"
+													EditorVisible="true"
+													AllowGroup="false" />
+
+				<DxDataGridColumn Field=@nameof(AAmodel.Tel)
+													Caption="Tel"
+													EditorVisible="true"
+													AllowGroup="false" />
+				<DxDataGridColumn Field=@nameof(AAmodel.Mail)
+													Caption="Mail"
+													EditorVisible="true"
+													AllowGroup="false" />
+				<DxDataGridColumn Field=@nameof(AAmodel.Info)
+													Caption="Info"
+													EditorVisible="true"
+													AllowGroup="false" />
+		</Columns>
+
+</DxDataGrid>
+
+<br />
+<h4><span class="badge badge-info"> Haftalık Başlangıç Bitiş zamaları </span></h4>
+
+<DxDataGrid @ref="@grid2"
+						Data="@data2"
+						KeyFieldName="WD"
+						@bind-SingleSelectedDataRow="@SelectedRow2"
+						RowEditStart="@(dataItem => SelectedRow2 = dataItem)"
+						RowUpdatingAsync="@OnRowUpdating2"
+						EditMode="DataGridEditMode.PopupEditForm"
+						InnerComponentSizeMode="SizeMode.Small"
+						CssClass="MyGrid table-striped">
+		<Columns>
+				<DxDataGridCommandColumn Width="3em">
+						<HeaderCellTemplate />
+						<CellTemplate>
+								<a class="oi oi-pencil" @onclick="@(() => grid2.StartRowEdit(context))" href="javascript:void(0);"></a>
+						</CellTemplate>
+				</DxDataGridCommandColumn>
+
+				<DxDataGridColumn Field=@nameof(AWmodel.WD)
+													Caption="WD"
+													Width="6em"
+													TextAlignment="DataGridTextAlign.Center"
+													EditorVisible="false" />
+				<DxDataGridColumn Field=@nameof(AWmodel.Ad)
+													Caption="Ad"
+													EditorVisible="true" />
+				<DxDataGridColumn Field=@nameof(AWmodel.Bas)
+													Caption="Başlangıç"
+													TextAlignment="DataGridTextAlign.Center"
+													EditorVisible="true"/>
+
+				<DxDataGridColumn Field=@nameof(AWmodel.Bit)
+													Caption="Bitiş"
+													TextAlignment="DataGridTextAlign.Center"
+													EditorVisible="true" />
+		</Columns>
+
+</DxDataGrid>
+
+@code {
+		private int AaID { get; set; }
+		private int UuID { get; set; }
+		private string UuSkl { get; set; }
+
+		List<AAmodel> data;
+		AAmodel SelectedRow;
+		DxDataGrid<AAmodel> grid;
+
+		private int GroupIndex { get; set; } = -1;
+
+		List<AWmodel> data2;
+		AWmodel SelectedRow2;
+		DxDataGrid<AWmodel> grid2;
+
+		protected override async Task OnInitializedAsync()
+		{
+				AaID = MyAppState.getAaID();
+				string sql = $"select * from AA where AaID = {AaID}";
+				data = await db.LoadData<AAmodel, dynamic>(sql, new { });
+
+				string sql2 = $"select * from AW where AaID = {AaID}";
+				data2 = await db.LoadData<AWmodel, dynamic>(sql2, new { });
+		}
+
+		async Task OnRowUpdating(AAmodel dataItem, IDictionary<string, object> newValue)
+		{
+				await db.UpdateRec(dataItem, newValue);
+		}
+
+		async Task OnRowUpdating2(AWmodel dataItem, IDictionary<string, object> newValue)
+		{
+				await db.UpdateRec(dataItem, newValue);
+		}
+
+		Task OnInitNewRow(Dictionary<string, object> values)
+		{
+				// values.Add("DgmTrh", DateTime.Today);
+				return Task.CompletedTask;
+		}
+
+		async Task OnRowInserting(IDictionary<string, object> newValue)
+		{
+				if (newValue.Count > 0)
+				{
+						newValue.Add("AaID", AaID);
+						var dataItem = await db.InsertRec<AAmodel>(newValue);
+						data.Add(dataItem);
+						SelectedRow = dataItem;
+						await InvokeAsync(StateHasChanged);
+				}
+		}
+
+}
