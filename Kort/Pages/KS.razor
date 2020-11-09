@@ -1,14 +1,14 @@
-﻿@page "/kk"
+﻿@page "/ks"
 
 @inject NavigationManager NavigationManager
 @inject IDataAccess db
 @inject MyAppState MyAppState
 
-<h4><span class="badge badge-info"> Kortlar </span></h4>
+<h4><span class="badge badge-info"> Kort Şekli </span></h4>
 
 <DxDataGrid @ref="@grid"
 						Data="@data"
-						KeyFieldName="KkID"
+						KeyFieldName="KsID"
 						@bind-SingleSelectedDataRow="@SelectedRow"
 						RowEditStart="@(dataItem => SelectedRow = dataItem)"
 						RowUpdatingAsync="@OnRowUpdating"
@@ -24,7 +24,6 @@
 						PageSize="20"
 						PagerAllowedPageSizes=@(new int[] { 5, 10, 20, 40 })
 						PagerNavigationMode=PagerNavigationMode.InputBox
-						HtmlRowDecoration="@OnHtmlRowDecoration"
 						CssClass="MyGrid table-striped">
 		<HeaderTemplate>
 				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
@@ -51,30 +50,23 @@
 						</CellTemplate>
 				</DxDataGridCommandColumn>
 
-				<DxDataGridColumn Field=@nameof(KKmodel.KkID)
+				<DxDataGridColumn Field=@nameof(KSmodel.KsID)
 													Caption="ID"
 													Width="6em"
 													TextAlignment="DataGridTextAlign.Center"
 													EditorVisible="false"
 													AllowGroup="false" />
+				<DxDataGridCheckBoxColumn Field=@nameof(KSmodel.Aktif)
+																	Caption="Aktif?"
+																	ValueUnchecked="0"
+																	ValueChecked="1"
+																	ValueIndeterminate="-1"
+																	 />
 
-				<DxDataGridComboBoxColumn Field=@nameof(KKmodel.KsID)
-																	Caption="Şkl"
-																	Width="10em"
-																	SortOrder="DataGridColumnSortOrder.Ascending"
-																	SortIndex="0"
-																	GroupIndex="@GroupIndex"
-																	TextAlignment="DataGridTextAlign.Center"
-																	TextFieldName="Ad"
-																	ValueFieldName="KsID"
-																	Data="@dataKS">
-				</DxDataGridComboBoxColumn>
-
-
-				<DxDataGridColumn Field=@nameof(KKmodel.Ad)
+				<DxDataGridColumn Field=@nameof(KSmodel.Ad)
 													Caption="Ad"
 													EditorVisible="true"
-													AllowGroup="false" />
+													AllowGroup="false"/>
 
 		</Columns>
 
@@ -86,15 +78,14 @@
 		private int UuID { get; set; }
 		private string UuSkl { get; set; }
 
-		List<KKmodel> data;
-		KKmodel SelectedRow;
-		DxDataGrid<KKmodel> grid;
+		List<KSmodel> data;
+		KSmodel SelectedRow;
+		DxDataGrid<KSmodel> grid;
 		bool ShowFilterRow = false;
 		//public List<SexModel> SexList { get; set; }
 		//private List<SexModel> SexList { get { return db.SexList(); } }
 		//private List<KTmodel> KtList { get; set; }
 		//private List<KTSLmodel> KtLookup { get; set; }
-		List<KSmodel> dataKS;
 
 		private int GroupIndex { get; set; } = -1;
 
@@ -105,15 +96,11 @@
 		protected override async Task OnInitializedAsync()
 		{
 				AaID = MyAppState.getAaID();
-				string sql = $"select * from KK where AaID = {AaID}";
-				data = await db.LoadData<KKmodel, dynamic>(sql, new { });
-
-				//string sql2 = $"select * from KS where AaID = {AaID} and Aktif = 1";
-				string sql2 = $"select * from KS where AaID = {AaID}";
-				dataKS = await db.LoadData<KSmodel, dynamic>(sql2, new { });
+				string sql = $"select * from KS where AaID = {AaID}";
+				data = await db.LoadData<KSmodel, dynamic>(sql, new { });
 		}
 
-		async Task OnRowUpdating(KKmodel dataItem, IDictionary<string, object> newValue)
+		async Task OnRowUpdating(KSmodel dataItem, IDictionary<string, object> newValue)
 		{
 				await db.UpdateRec(dataItem, newValue);
 		}
@@ -129,35 +116,11 @@
 				if (newValue.Count > 0)
 				{
 						newValue.Add("AaID", AaID);
-						var dataItem = await db.InsertRec<KKmodel>(newValue);
+						var dataItem = await db.InsertRec<KSmodel>(newValue);
 						data.Add(dataItem);
 						SelectedRow = dataItem;
 						await InvokeAsync(StateHasChanged);
 				}
 		}
 
-		void OnHtmlRowDecoration(DataGridHtmlRowDecorationEventArgs<KKmodel> eventArgs)
-		{
-				if (eventArgs is DataGridHtmlGroupRowDecorationEventArgs<KKmodel> groupEventArgs)
-				{
-						//if (groupEventArgs.Expanded)
-						groupEventArgs.CssClass += " font-weight-bold text-danger";
-				}
-				else
-				{
-						switch (eventArgs.RowType)
-						{
-								case DataGridHtmlRowDecorationType.DataRow:
-										break;
-								case DataGridHtmlRowDecorationType.EditFormRow:
-										//eventArgs.CssClass += " EditForm HidePreview";
-										// eventArgs.Style = " background-color:azure;";
-										//eventArgs.Attributes.Add("data-editform", "aaaaa");
-										break;
-								default:
-										eventArgs.CssClass += " table-reflow";
-										break;
-						}
-				}
-		}
 }

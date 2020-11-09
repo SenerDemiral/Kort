@@ -89,7 +89,7 @@
 																	Caption="Kayıt"
 																	Width="6em"
 																	AllowGroup="false"
-																  AllowFilter="false"
+																	AllowFilter="false"
 																	DisplayFormat="dd.MM.yy"
 																	TextAlignment="DataGridTextAlign.Center" />
 
@@ -188,16 +188,16 @@
 										ReadOnly="true"
 										ResizeMode="MemoResizeMode.VerticalAndHorizontal" />
 				</div>
-				@if (context.Skl == "G")
+				@if (context.Skl == "G" || context.Skl == "H")
 				{
-				<DxTagBox Data="@data"
-									TextFieldName="Ad"
-									ValueFieldName="IDS"
-									@bind-Values="@context.SelectedUuIDs"
-									Enabled="false"
-									ListRenderMode="ListRenderMode.Virtual"
-									ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-				</DxTagBox>
+						<DxTagBox Data="@data"
+											TextFieldName="Ad"
+											ValueFieldName="IDS"
+											@bind-Values="@context.SelectedUuIDs"
+											Enabled="false"
+											ListRenderMode="ListRenderMode.Virtual"
+											ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+						</DxTagBox>
 				}
 				<DxTagBox Data="@TgData"
 									TextFieldName="@nameof(TGmodel.Ad)"
@@ -300,9 +300,9 @@
 																ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
 										</Template>
 								</DxFormLayoutItem>
-								@if (EditContext.Skl == "G")
+								@if (EditContext.Skl == "G" || EditContext.Skl == "H")
 								{
-										<DxFormLayoutItem Caption="Grup Kişileri" ColSpanMd="12" Context="FormLayoutContext">
+										<DxFormLayoutItem Caption="İlgili Kişiler" ColSpanMd="12" Context="FormLayoutContext">
 												<Template>
 														<DxTagBox Data="@data"
 																			TextFieldName="Ad"
@@ -412,7 +412,8 @@
 		{
 				AaID = MyAppState.getAaID();
 
-				string sql = $"select * from UU where AaID = {AaID}";
+				//string sql = $"select * from UU where AaID = {AaID}";
+				string sql = $"select * from UU_S({AaID})";
 				data = await db.LoadData<UUmodel, dynamic>(sql, new { });
 
 				TgData = await db.LoadData<TGmodel, dynamic>($"select * from TG where AaID = {AaID} and Skl = 'K' order by Ad", new { });

@@ -47,10 +47,8 @@
 													EditorVisible="false"
 													AllowGroup="false" />
 
-				<DxDataGridColumn Field=@nameof(RRmodel.UuID)
+				<DxDataGridColumn Field=@nameof(RRmodel.UuAd)
 													Caption="User"
-													Width="6em"
-													TextAlignment="DataGridTextAlign.Center"
 													EditorVisible="false"
 													AllowGroup="false" />
 
@@ -61,12 +59,28 @@
 																	EditorVisible="false"
 																	DisplayFormat="dd.MM.yy HH:mm:ss" />
 
-				<DxDataGridColumn Field=@nameof(RRmodel.KkSkl)
-													Caption="Kort"
-													Width="3em"
-													TextAlignment="DataGridTextAlign.Center"
-													EditorVisible="false"
-													AllowGroup="false" />
+				<DxDataGridComboBoxColumn Field=@nameof(RRmodel.Drm)
+																	Caption="Drm"
+																	SortOrder="DataGridColumnSortOrder.Ascending"
+																	SortIndex="0"
+																	GroupIndex="@GroupIndex"
+																	TextAlignment="DataGridTextAlign.Center"
+																	TextFieldName="Ad"
+																	ValueFieldName="Skl"
+																	Data="@db.RrDrmList()">
+				</DxDataGridComboBoxColumn>
+
+				<DxDataGridComboBoxColumn Field=@nameof(RRmodel.KsID)
+																	Caption="Kort"
+																	Width="10em"
+																	SortOrder="DataGridColumnSortOrder.Ascending"
+																	SortIndex="0"
+																	GroupIndex="@GroupIndex"
+																	TextAlignment="DataGridTextAlign.Center"
+																	TextFieldName="Ad"
+																	ValueFieldName="KsID"
+																	Data="@dataKS">
+				</DxDataGridComboBoxColumn>
 
 				<DxDataGridDateEditColumn Field=@nameof(RRmodel._BasTrhD)
 																	TextAlignment="DataGridTextAlign.Center"
@@ -120,6 +134,7 @@
 		List<RRmodel> data;
 		RRmodel SelectedRow;
 		DxDataGrid<RRmodel> grid;
+		List<KSmodel> dataKS;
 
 		private int GroupIndex { get; set; } = -1;
 
@@ -128,6 +143,9 @@
 				AaID = MyAppState.getAaID();
 				string sql = $"select * from RR_S({AaID})";
 				data = await db.LoadData<RRmodel, dynamic>(sql, new { });
+
+				string sql2 = $"select * from KS where AaID = {AaID}";
+				dataKS = await db.LoadData<KSmodel, dynamic>(sql2, new { });
 		}
 
 		async Task OnRowUpdating(RRmodel dataItem, IDictionary<string, object> newValue)

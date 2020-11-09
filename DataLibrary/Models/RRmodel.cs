@@ -14,14 +14,21 @@ namespace DataLibrary.Models
         public int RrID { get; set; }
         public int AaID { get; set; }
         public int UuID { get; set; }
+        public int KsID { get; set; }
         public string Drm { get; set; }
-        public string KkSkl { get; set; }
         public string Info { get; set; }
         public DateTime BasTrh { get; set; }
         public int Sure { get; set; }   // Dakika
         public DateTime BitTrh { get; set; }
         public DateTime? EXD { get; set; }
         public string Nots { get; set; }
+
+        [NotMapped]
+        public string UuAd { get; set; }
+
+        [NotMapped]
+        public string KsAd { get; set; }
+
         public string UuIDs { get; set; }
 
         [NotMapped]

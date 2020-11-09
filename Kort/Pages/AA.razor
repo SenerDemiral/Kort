@@ -4,7 +4,7 @@
 @inject IDataAccess db
 @inject MyAppState MyAppState
 
-<h4><span class="badge badge-info"> Klüp </span></h4>
+<h4><span class="badge badge-info"> Kulüp </span></h4>
 
 <DxDataGrid @ref="@grid"
 						Data="@data"
@@ -44,7 +44,7 @@
 
 				<DxDataGridColumn Field=@nameof(AAmodel.Ad)
 													Caption="Ad"
-													EditorVisible="true"
+													EditorVisible="false"
 													AllowGroup="false" />
 
 				<DxDataGridColumn Field=@nameof(AAmodel.Tel)

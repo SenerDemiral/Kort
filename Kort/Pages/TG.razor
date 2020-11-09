@@ -76,7 +76,6 @@ else
 																			SortIndex="0"
 																			TextFieldName="Ad"
 																			ValueFieldName="Skl"
-																			ListRenderMode="ListRenderMode.Virtual"
 																			Data="@db.TgSklList()">
 						</DxDataGridComboBoxColumn>
 
@@ -98,6 +97,7 @@ else
 										<DxFormLayoutItem Caption="Şkl" ColSpanMd="4" Context="FormLayoutContext">
 												<Template>
 														<DxComboBox @bind-Value="@EditContext.Skl"
+		  																	AllowUserInput="true"
 																				TextFieldName="Ad"
 																				ValueFieldName="Skl"
 																				Enabled="@EditContext.IsNewRow"

@@ -22,7 +22,7 @@ namespace DataLibrary
         private readonly IConfiguration _config;
         private Dictionary<string, string> myTableFields = new Dictionary<string, string>();
         private List<SexModel> sexList;
-        private List<SklModel> kkSklList;
+        private List<SklModel> rrDrmList;
         private List<SklModel> tgSklList;
         private List<SklModel> uuSklList;
 
@@ -42,11 +42,10 @@ namespace DataLibrary
                 new SexModel { Sex = "X", Ad = "XX" }
             };
 
-            kkSklList = new List<SklModel>() {
-                new SklModel { Skl = "A", Ad = "Açık" },
-                new SklModel { Skl = "K", Ad = "Kapalı" },
-                new SklModel { Skl = "B", Ad = "Balon" },
-                new SklModel { Skl = "C", Ad = "Çocuk" }
+            rrDrmList = new List<SklModel>() {
+                new SklModel { Skl = "R", Ad = "Rzrv" },
+                new SklModel { Skl = "I", Ad = "İptal" },
+                new SklModel { Skl = "X", Ad = "Gelmedi" }
             };
 
             uuSklList = new List<SklModel>() {
@@ -60,7 +59,7 @@ namespace DataLibrary
 
             tgSklList = new List<SklModel>() {
                 new SklModel { Skl = "K", Ad = "Kişi" },
-                new SklModel { Skl = "R", Ad = "Rezervasyon" }
+                new SklModel { Skl = "R", Ad = "Rzrvsyn" }
             };
 
             //myTableFields = MyTableFields(typeof(KHmodel));
@@ -71,9 +70,9 @@ namespace DataLibrary
             return sexList;
         }
 
-        public List<SklModel> KkSklList()
+        public List<SklModel> RrDrmList()
         {
-            return kkSklList;
+            return rrDrmList;
         }
         public List<SklModel> UuSklList()
         {
