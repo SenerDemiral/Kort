@@ -30,16 +30,11 @@ namespace DataLibrary.Models
         public string Pwd { get; set; }
         
         [StringLength(20)]
-        public string Tel1 { get; set; }
+        public string Tel { get; set; }
         
-        [StringLength(20)]
-        public string Tel2 { get; set; }
-
         [StringLength(40)]
-        public string Mail1 { get; set; }
+        public string Mail { get; set; }
 
-        [StringLength(40)]
-        public string Mail2 { get; set; }
         public int MailOK { get; set; } = -1; // eMail alirim
         public int SmsOK { get; set; } = -1;  // SMS alirim
 

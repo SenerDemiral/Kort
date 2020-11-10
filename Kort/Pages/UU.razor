@@ -140,12 +140,12 @@
 								<tbody>
 										<tr>
 												<td class="MyDetailRowLabel">Tel</td>
-												<td style="width:8rem">@context.Tel1</td>
+												<td style="width:6rem">@context.Tel</td>
 
-												<td class="MyDetailRowLabel">Mail Adresi</td>
-												<td style="width:20rem">@context.Mail1</td>
+												<td class="MyDetailRowLabel">Mail</td>
+												<td style="width:20rem">@context.Mail</td>
 
-												<td rowspan="2" style="width:6rem">
+												<td style="width:6rem">
 														<DxCheckBox LabelPosition="LabelPosition.Left"
 																				Alignment="CheckBoxContentAlignment.Center"
 																				Enabled="false"
@@ -157,7 +157,7 @@
 																Mail?
 														</DxCheckBox>
 												</td>
-												<td rowspan="2" style="width:6rem">
+												<td style="width:6rem">
 														<DxCheckBox LabelPosition="LabelPosition.Left"
 																				Alignment="CheckBoxContentAlignment.Center"
 																				Enabled="false"
@@ -170,14 +170,6 @@
 														</DxCheckBox>
 												</td>
 										</tr>
-										<tr>
-												<td class="MyDetailRowLabel">Tel2</td>
-												<td style="width:8rem">@context.Tel2</td>
-
-												<td class="MyDetailRowLabel">Mail Adresi2</td>
-												<td style="width:20rem">@context.Mail2</td>
-
-										</tr>
 								</tbody>
 						</table>
 				</div>
@@ -188,23 +180,20 @@
 										ReadOnly="true"
 										ResizeMode="MemoResizeMode.VerticalAndHorizontal" />
 				</div>
-				@if (context.Skl == "G" || context.Skl == "H")
-				{
-						<DxTagBox Data="@data"
-											TextFieldName="Ad"
-											ValueFieldName="IDS"
-											@bind-Values="@context.SelectedUuIDs"
-											Enabled="false"
-											ListRenderMode="ListRenderMode.Virtual"
-											ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-						</DxTagBox>
-				}
+				@*@if (context.Skl == "G" || context.Skl == "H")*@
+				İlgililer
+				<DxTagBox Data="@dataL"
+									TextFieldName="Ad"
+									ValueFieldName="IDS"
+									@bind-Values="@context.SelectedUuIDs"
+									Enabled="false">
+				</DxTagBox>
+				Etiketler
 				<DxTagBox Data="@TgData"
 									TextFieldName="@nameof(TGmodel.Ad)"
 									ValueFieldName="@nameof(TGmodel.IDS)"
 									@bind-Values="@context.SelectedTGs"
-									Enabled="false"
-									ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+									Enabled="false">
 				</DxTagBox>
 
 		</DetailRowTemplate>
@@ -248,12 +237,12 @@
 
 								<DxFormLayoutItem Caption="Tel" ColSpanMd="2" Context="FormLayoutContext" BeginRow="true">
 										<Template>
-												<DxTextBox @bind-Text="@EditContext.Tel1" />
+												<DxTextBox @bind-Text="@EditContext.Tel" />
 										</Template>
 								</DxFormLayoutItem>
 								<DxFormLayoutItem Caption="eMail" ColSpanMd="4" Context="FormLayoutContext">
 										<Template>
-												<DxTextBox @bind-Text="@EditContext.Mail1" />
+												<DxTextBox @bind-Text="@EditContext.Mail" />
 										</Template>
 								</DxFormLayoutItem>
 								<DxFormLayoutItem Caption="MailOK" ColSpanMd="2" Context="FormLayoutContext">
@@ -266,17 +255,6 @@
 										<Template>
 												<DxCheckBox @bind-Checked="@EditContext.SmsOK" AllowIndeterminateStateByClick="false"
 																		ValueChecked="1" ValueUnchecked="0" ValueIndeterminate="-1" />
-										</Template>
-								</DxFormLayoutItem>
-
-								<DxFormLayoutItem Caption="Tel2" ColSpanMd="2" Context="FormLayoutContext" BeginRow="true">
-										<Template>
-												<DxTextBox @bind-Text="@EditContext.Tel2" />
-										</Template>
-								</DxFormLayoutItem>
-								<DxFormLayoutItem Caption="eMail2" ColSpanMd="4" Context="FormLayoutContext">
-										<Template>
-												<DxTextBox @bind-Text="@EditContext.Mail2" />
 										</Template>
 								</DxFormLayoutItem>
 
@@ -300,18 +278,18 @@
 																ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
 										</Template>
 								</DxFormLayoutItem>
-								@if (EditContext.Skl == "G" || EditContext.Skl == "H")
+								@*@if (EditContext.Skl == "G" || EditContext.Skl == "H" || EditContext.Skl == "O")*@
 								{
-										<DxFormLayoutItem Caption="İlgili Kişiler" ColSpanMd="12" Context="FormLayoutContext">
-												<Template>
-														<DxTagBox Data="@data"
-																			TextFieldName="Ad"
-																			ValueFieldName="IDS"
-																			@bind-Values="@(EditContext.SelectedUuIDs)"
-																			ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-														</DxTagBox>
-												</Template>
-										</DxFormLayoutItem>
+								<DxFormLayoutItem Caption="İlgili Kişiler" ColSpanMd="12" Context="FormLayoutContext">
+										<Template>
+												<DxTagBox Data="@dataL"
+																	TextFieldName="Ad"
+																	ValueFieldName="IDS"
+																	@bind-Values="@(EditContext.SelectedUuIDs)"
+																	ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+												</DxTagBox>
+										</Template>
+								</DxFormLayoutItem>
 								}
 								<DxFormLayoutItem Caption="Etiketler" ColSpanMd="12" Context="FormLayoutContext">
 										<Template>
@@ -367,6 +345,7 @@
 
 @code {
 		List<UUmodel> data;
+		List<UULmodel> dataL;
 		DxDataGrid<UUmodel> grid;
 		bool Enabled = true;
 		bool ShowFilterRow = false;
@@ -415,6 +394,12 @@
 				//string sql = $"select * from UU where AaID = {AaID}";
 				string sql = $"select * from UU_S({AaID})";
 				data = await db.LoadData<UUmodel, dynamic>(sql, new { });
+
+				dataL = new List<UULmodel>();
+				foreach(var d in data)
+				{
+						dataL.Add(new UULmodel { IDS = d.IDS, Ad = d.Ad });
+				}
 
 				TgData = await db.LoadData<TGmodel, dynamic>($"select * from TG where AaID = {AaID} and Skl = 'K' order by Ad", new { });
 		}

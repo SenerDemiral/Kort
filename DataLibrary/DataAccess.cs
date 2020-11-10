@@ -25,6 +25,7 @@ namespace DataLibrary
         private List<SklModel> rrDrmList;
         private List<SklModel> tgSklList;
         private List<SklModel> uuSklList;
+        private List<ZmnModel> zmnList;
 
         public DataAccess(IConfiguration config)
         {
@@ -62,6 +63,14 @@ namespace DataLibrary
                 new SklModel { Skl = "R", Ad = "Rzrvsyn" }
             };
 
+            zmnList = new List<ZmnModel>();
+            DateTime Trh = new DateTime(2020, 01, 01, 06, 0, 0);    // 06:00 - 23:30
+            for (int i=0; i<36; i++)
+						{
+                zmnList.Add(new ZmnModel { Dak = Trh.Hour * 60 + Trh.Minute, Ad = Trh.ToString("HH:mm") });
+                Trh = Trh.AddMinutes(30);
+            }
+
             //myTableFields = MyTableFields(typeof(KHmodel));
         }
 
@@ -81,6 +90,10 @@ namespace DataLibrary
         public List<SklModel> TgSklList()
         {
             return tgSklList;
+        }
+        public List<ZmnModel> ZmnList()
+        {
+            return zmnList;
         }
 
         public async Task<T> LoadRec<T, U>(string sql, U parameters)

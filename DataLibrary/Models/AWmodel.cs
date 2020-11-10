@@ -10,8 +10,8 @@ namespace DataLibrary.Models
     public class AWmodel
     {
         [Key]
-        public int AaID { get; set; }
         public int WD { get; set; }
+        public int AaID { get; set; }
         public int Bas { get; set; }    // Dakika cinsinde 8 * 60
         public int Bit { get; set; }
 

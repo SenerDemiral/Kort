@@ -88,18 +88,29 @@
 													Width="6em"
 													TextAlignment="DataGridTextAlign.Center"
 													EditorVisible="false" />
+
 				<DxDataGridColumn Field=@nameof(AWmodel.Ad)
 													Caption="Ad"
-													EditorVisible="true" />
-				<DxDataGridColumn Field=@nameof(AWmodel.Bas)
-													Caption="Başlangıç"
-													TextAlignment="DataGridTextAlign.Center"
-													EditorVisible="true"/>
+													EditorVisible="false" />
 
-				<DxDataGridColumn Field=@nameof(AWmodel.Bit)
-													Caption="Bitiş"
-													TextAlignment="DataGridTextAlign.Center"
-													EditorVisible="true" />
+				<DxDataGridComboBoxColumn Field=@nameof(AWmodel.Bas)
+																	Caption="Başlangıç"
+																	Width="10em"
+																	TextAlignment="DataGridTextAlign.Center"
+																	TextFieldName="Ad"
+																	ValueFieldName="Dak"
+																	Data="@db.ZmnList()">
+				</DxDataGridComboBoxColumn>
+
+				<DxDataGridComboBoxColumn Field=@nameof(AWmodel.Bit)
+																	Caption="Bitiş"
+																	Width="10em"
+																	TextAlignment="DataGridTextAlign.Center"
+																	TextFieldName="Ad"
+																	ValueFieldName="Dak"
+																	Data="@db.ZmnList()">
+				</DxDataGridComboBoxColumn>
+
 		</Columns>
 
 </DxDataGrid>

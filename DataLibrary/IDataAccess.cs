@@ -12,6 +12,7 @@ namespace DataLibrary
         List<SklModel> RrDrmList();
         List<SklModel> UuSklList();
         List<SklModel> TgSklList();
+        List<ZmnModel> ZmnList();
         Task<T> LoadRec<T, U>(string sql, U parameters);
         Task<List<T>> LoadData<T, U>(string sql, U parameters);
         Task SaveData<T>(string sql, T parameters);
