@@ -60,7 +60,8 @@ namespace DataLibrary
 
             tgSklList = new List<SklModel>() {
                 new SklModel { Skl = "K", Ad = "Kişi" },
-                new SklModel { Skl = "R", Ad = "Rzrvsyn" }
+                new SklModel { Skl = "R", Ad = "Rzrvsyn" },
+                new SklModel { Skl = "X", Ad = "XXXX" },
             };
 
             zmnList = new List<ZmnModel>();

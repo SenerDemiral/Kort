@@ -22,5 +22,7 @@ namespace DataLibrary.Models
         public string Mail { get; set; }
         
         public string Info { get; set; }
+
+        public int RzrMaxGun { get; set; }
     }
 }

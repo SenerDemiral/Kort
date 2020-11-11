@@ -31,7 +31,7 @@
 						<DxFormLayoutItem Caption="Kort" ColSpanMd="3">
 								<Template>
 										<DxComboBox @bind-Value="@KsID"
-																AllowUserInput="true"
+																NullText="Kort Seçin..."
 																TextFieldName="Ad"
 																ValueFieldName="KsID"
 																Data="@dataKS" />
@@ -110,10 +110,11 @@
 		DxDataGrid<RRdrmModel> grid;
 		List<KSmodel> dataKS;
 
-		DateTime MinDate { get; set; } = DateTime.Today;
-		DateTime MaxDate { get; set; } = DateTime.Today.AddDays(10);
 
-		DateTime Trh = new DateTime(2020, 11, 5, 8, 0, 0);
+		DateTime Trh { get; set; }
+		DateTime MinDate { get; set; }
+		DateTime MaxDate { get; set; }
+
 		int KsID = 0;
 		int Sure = 60;
 		int Period = 60;
@@ -138,8 +139,17 @@
 		protected override async Task OnInitializedAsync()
 		{
 				AaID = MyAppState.getAaID();
+				var aa = await db.LoadData<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
+				int RzrMaxGun = aa[0].RzrMaxGun;
+
+				//Trh = DateTime.Today;
+				Trh = new DateTime(2020, 11, 11, 8, 0, 0);	// 11inde kayit var onu gormek icin, simdilik
+				MinDate = Trh;
+				MaxDate = MinDate.AddDays(RzrMaxGun);
+
 				string sql = $"select * from KS where AaID = {AaID} and Aktif = 1";
 				dataKS = await db.LoadData<KSmodel, dynamic>(sql, new { });
+				KsID = dataKS[0].KsID;
 		}
 
 }

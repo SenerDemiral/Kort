@@ -42,7 +42,7 @@ else
 															 Click="@((ToolbarItemClickEventArgs e) => ShowFilterRow = !ShowFilterRow)"
 															 IconCssClass="oi oi-eye"
 															 Enabled="@Enabled" />
-								<DxToolbarItem Text="@(MyAppState.getUsrName())"
+								<DxToolbarItem Text="@(MyAppState.getAaAd())"
 															 BeginGroup="true"
 															 Alignment="ToolbarItemAlignment.Right"
 															 CssClass="font-italic"
@@ -72,11 +72,9 @@ else
 						<DxDataGridComboBoxColumn Field=@nameof(TGmodel.Skl)
 																			Caption="Şkl"
 																			Width="6em"
-																			SortOrder="DataGridColumnSortOrder.Ascending"
-																			SortIndex="0"
 																			TextFieldName="Ad"
 																			ValueFieldName="Skl"
-																			Data="@db.TgSklList()">
+																			Data="@(db.TgSklList())">
 						</DxDataGridComboBoxColumn>
 
 						<DxDataGridColumn Field=@nameof(TGmodel.Ad)
@@ -97,7 +95,6 @@ else
 										<DxFormLayoutItem Caption="Şkl" ColSpanMd="4" Context="FormLayoutContext">
 												<Template>
 														<DxComboBox @bind-Value="@EditContext.Skl"
-		  																	AllowUserInput="true"
 																				TextFieldName="Ad"
 																				ValueFieldName="Skl"
 																				Enabled="@EditContext.IsNewRow"

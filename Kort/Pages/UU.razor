@@ -93,13 +93,19 @@
 																	DisplayFormat="dd.MM.yy"
 																	TextAlignment="DataGridTextAlign.Center" />
 
+				<DxDataGridDateEditColumn Field=@nameof(UUmodel.BitTrh)
+																	Caption="ÜyeBitTrh"
+																	Width="6em"
+																	AllowGroup="false"
+																	AllowFilter="false"
+																	DisplayFormat="dd.MM.yy"
+																	TextAlignment="DataGridTextAlign.Center" />
 
 				<DxDataGridComboBoxColumn Field=@nameof(UUmodel.Skl)
 																	Caption="Şkl"
 																	Width="10em"
 																	TextFieldName="Ad"
 																	ValueFieldName="Skl"
-																	ListRenderMode="ListRenderMode.Virtual"
 																	Data="@db.UuSklList()">
 				</DxDataGridComboBoxColumn>
 
