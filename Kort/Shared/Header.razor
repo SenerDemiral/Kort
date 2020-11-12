@@ -8,7 +8,7 @@
 		<button class="navbar-toggler bg-primary d-block" @onclick="OnToggleClick">
 				<span class="navbar-toggler-icon"></span>
 		</button>
-		<div class="ml-3 font-weight-bold title pr-4">dMax</div>
+		@*<div class="ml-3 font-weight-bold title pr-4">Kort</div>*@
 
 		@if (MyAppState.getUsrID() == 0)
 		{
@@ -18,7 +18,7 @@
 		}
 		else
 		{
-				<em><b>@MyAppState.getUsrFull()</b></em>
+				<em><b style="margin-left:5px"> @MyAppState.getUsrFull()</b></em>
 				<button class="navbar-toggler bg-primary d-block" style="color: aliceblue;margin-left: auto" @onclick="LogoutUser">
 						<span class="oi oi-account-logout"></span>
 				</button>

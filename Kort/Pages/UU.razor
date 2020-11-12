@@ -85,22 +85,6 @@
 						</DisplayTemplate>
 				</DxDataGridColumn>
 
-				<DxDataGridDateEditColumn Field=@nameof(UUmodel.EXD)
-																	Caption="Kayıt"
-																	Width="6em"
-																	AllowGroup="false"
-																	AllowFilter="false"
-																	DisplayFormat="dd.MM.yy"
-																	TextAlignment="DataGridTextAlign.Center" />
-
-				<DxDataGridDateEditColumn Field=@nameof(UUmodel.BitTrh)
-																	Caption="ÜyeBitTrh"
-																	Width="6em"
-																	AllowGroup="false"
-																	AllowFilter="false"
-																	DisplayFormat="dd.MM.yy"
-																	TextAlignment="DataGridTextAlign.Center" />
-
 				<DxDataGridComboBoxColumn Field=@nameof(UUmodel.Skl)
 																	Caption="Şkl"
 																	Width="10em"
@@ -126,6 +110,23 @@
 																	AllowFilter="false"
 																	DisplayFormat="dd.MM.yyyy"
 																	TextAlignment="DataGridTextAlign.Center" />
+
+				<DxDataGridDateEditColumn Field=@nameof(UUmodel.EXD)
+																	Caption="Kayıt"
+																	Width="6em"
+																	AllowGroup="false"
+																	AllowFilter="false"
+																	DisplayFormat="dd.MM.yy"
+																	TextAlignment="DataGridTextAlign.Center" />
+
+				<DxDataGridDateEditColumn Field=@nameof(UUmodel.BitTrh)
+																	Caption="ÜyeBitTrh"
+																	Width="6em"
+																	AllowGroup="false"
+																	AllowFilter="false"
+																	DisplayFormat="dd.MM.yy"
+																	TextAlignment="DataGridTextAlign.Center" />
+
 		</Columns>
 
 		<TotalSummary>
@@ -173,6 +174,18 @@
 																				CssClass="MyDetailRowLabel"
 																				@bind-Checked="@context.SmsOK">
 																SMS?
+														</DxCheckBox>
+												</td>
+												<td style="width:8rem">
+														<DxCheckBox LabelPosition="LabelPosition.Left"
+																				Alignment="CheckBoxContentAlignment.Center"
+																				Enabled="false"
+																				ValueUnchecked="0"
+																				ValueChecked="1"
+																				ValueIndeterminate="-1"
+																				CssClass="MyDetailRowLabel"
+																				@bind-Checked="@context.RrOK">
+																Rzrv?
 														</DxCheckBox>
 												</td>
 										</tr>
@@ -251,15 +264,21 @@
 												<DxTextBox @bind-Text="@EditContext.Mail" />
 										</Template>
 								</DxFormLayoutItem>
-								<DxFormLayoutItem Caption="MailOK" ColSpanMd="2" Context="FormLayoutContext">
+								<DxFormLayoutItem Caption="Mail?" ColSpanMd="2" Context="FormLayoutContext">
 										<Template>
 												<DxCheckBox @bind-Checked="@EditContext.MailOK"
 																		ValueChecked="1" ValueUnchecked="0" ValueIndeterminate="-1" />
 										</Template>
 								</DxFormLayoutItem>
-								<DxFormLayoutItem Caption="SmsOK" ColSpanMd="2" Context="FormLayoutContext">
+								<DxFormLayoutItem Caption="Sms?" ColSpanMd="2" Context="FormLayoutContext">
 										<Template>
 												<DxCheckBox @bind-Checked="@EditContext.SmsOK" AllowIndeterminateStateByClick="false"
+																		ValueChecked="1" ValueUnchecked="0" ValueIndeterminate="-1" />
+										</Template>
+								</DxFormLayoutItem>
+								<DxFormLayoutItem Caption="Rzr?" ColSpanMd="2" Context="FormLayoutContext">
+										<Template>
+												<DxCheckBox @bind-Checked="@EditContext.RrOK" AllowIndeterminateStateByClick="false"
 																		ValueChecked="1" ValueUnchecked="0" ValueIndeterminate="-1" />
 										</Template>
 								</DxFormLayoutItem>
@@ -284,19 +303,17 @@
 																ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
 										</Template>
 								</DxFormLayoutItem>
-								@*@if (EditContext.Skl == "G" || EditContext.Skl == "H" || EditContext.Skl == "O")*@
-								{
 								<DxFormLayoutItem Caption="İlgili Kişiler" ColSpanMd="12" Context="FormLayoutContext">
 										<Template>
 												<DxTagBox Data="@dataL"
 																	TextFieldName="Ad"
 																	ValueFieldName="IDS"
 																	@bind-Values="@(EditContext.SelectedUuIDs)"
+																	ListRenderMode="ListRenderMode.Virtual"
 																	ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
 												</DxTagBox>
 										</Template>
 								</DxFormLayoutItem>
-								}
 								<DxFormLayoutItem Caption="Etiketler" ColSpanMd="12" Context="FormLayoutContext">
 										<Template>
 												<DxTagBox Data="@TgData"

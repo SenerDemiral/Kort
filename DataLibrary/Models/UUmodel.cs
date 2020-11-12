@@ -37,6 +37,7 @@ namespace DataLibrary.Models
 
         public int MailOK { get; set; } = -1; // eMail alirim
         public int SmsOK { get; set; } = -1;  // SMS alirim
+        public int RrOK { get; set; } = -1;  // Rzrv yapabilir
 
         public DateTime? BitTrh { get; set; }
         public DateTime? EXD { get; set; }

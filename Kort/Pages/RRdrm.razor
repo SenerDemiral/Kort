@@ -3,11 +3,10 @@
 @inject NavigationManager NavigationManager
 @inject IDataAccess db
 @inject MyAppState MyAppState
-
 @*<h4><span class="badge badge-info"> Kort Durumu & Rezervasyon </span></h4>*@
 
 <div class="card">
-		<h5 class="card-header">Kort Durumu & Rezervasyon</h5>
+		<h5 class="card-header">Kort Durumu</h5>
 		<div class="card-body">
 				<DxFormLayout ItemSizeMode="SizeMode.Small">
 						<DxFormLayoutItem Caption="Tarih" ColSpanMd="3">
@@ -101,12 +100,62 @@
 
 </DxDataGrid>
 
+<br />
+
+<div class="card">
+		<h5 class="card-header">Rezervasyon</h5>
+		<div class="card-body">
+				<DxFormLayout ItemSizeMode="SizeMode.Small">
+						<DxFormLayoutItem Caption="Tarih" ColSpanMd="12">
+								<Template>
+										<DxTextBox Text="@iTrh?.ToString("dd MMMM dddd HH:mm")" ReadOnly="true" />
+								</Template>
+						</DxFormLayoutItem>
+
+						<DxFormLayoutItem ColSpanMd="4" BeginRow="true">
+								<Template>
+										<DxButton RenderStyle="ButtonRenderStyle.Warning" Click="@RrTalep" Text="Rezervasyon Talep" Enabled="TalepEnabled" />
+								</Template>
+						</DxFormLayoutItem>
+
+						<DxFormLayoutItem Caption="Talep Sonucu" ColSpanMd="12" BeginRow="true">
+								<Template>
+										<DxTextBox Text='@TalepMsj' ReadOnly="true" />
+								</Template>
+						</DxFormLayoutItem>
+				</DxFormLayout>
+		</div>
+</div>
+
+<br />
+
 
 @code {
 		private int AaID { get; set; }
+		private int UuID { get; set; }
 
 		List<RRdrmModel> data;
-		RRdrmModel SelectedRow;
+
+		DateTime? iTrh;
+		bool TalepEnabled = false;
+		string TalepMsj = "";
+		int TalepRrID = 0;
+
+		RRdrmModel selectedRow;
+		RRdrmModel SelectedRow
+		{
+				get { return selectedRow; }
+				set
+				{
+						selectedRow = value;
+						iTrh = selectedRow.Trh;
+						if (selectedRow.NBK > 0)
+								TalepEnabled = true;
+						else
+								TalepEnabled = false;
+						StateHasChanged();
+				}
+		}
 		DxDataGrid<RRdrmModel> grid;
 		List<KSmodel> dataKS;
 
@@ -119,10 +168,32 @@
 		int Sure = 60;
 		int Period = 60;
 
+		async Task RrTalep()
+		{
+				dynamic p = new
+				{
+						AaID = AaID,
+						UuID = UuID,
+						Trh = SelectedRow.Trh,
+						Sure = Sure,
+						KsID = KsID,
+				};
+
+				string sql = $"select * from RR_TALEP(@AaID, @UuID,  @Trh, @Sure, @KsID)";
+				RRtalepModel aaa = await db.LoadRec<RRtalepModel, dynamic>(sql, p);
+
+				TalepRrID = aaa.RrID;
+				if (TalepRrID == 0)
+						TalepMsj = $"{aaa.Msj}";
+				else
+						TalepMsj = $"{aaa.Msj} RzrvNo: {aaa.RrID:N0}";
+				
+				await Read();
+				StateHasChanged();
+		}
+
 		async Task Read()
 		{
-				AaID = MyAppState.getAaID();
-
 				dynamic p = new
 				{
 						AaID = AaID,
@@ -139,11 +210,13 @@
 		protected override async Task OnInitializedAsync()
 		{
 				AaID = MyAppState.getAaID();
+				UuID = MyAppState.getUsrID();
+
 				var aa = await db.LoadData<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
 				int RzrMaxGun = aa[0].RzrMaxGun;
 
 				//Trh = DateTime.Today;
-				Trh = new DateTime(2020, 11, 11, 8, 0, 0);	// 11inde kayit var onu gormek icin, simdilik
+				Trh = new DateTime(2020, 11, 11, 8, 0, 0);  // 11inde kayit var onu gormek icin, simdilik
 				MinDate = Trh;
 				MaxDate = MinDate.AddDays(RzrMaxGun);
 
