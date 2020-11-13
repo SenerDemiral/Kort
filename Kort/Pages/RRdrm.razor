@@ -102,6 +102,8 @@
 
 <br />
 
+@if (usrRrOK)
+{
 <div class="card">
 		<h5 class="card-header">Rezervasyon</h5>
 		<div class="card-body">
@@ -126,8 +128,7 @@
 				</DxFormLayout>
 		</div>
 </div>
-
-<br />
+}
 
 
 @code {
@@ -140,6 +141,8 @@
 		bool TalepEnabled = false;
 		string TalepMsj = "";
 		int TalepRrID = 0;
+		string usrSkl = "";
+		bool usrRrOK = false;
 
 		RRdrmModel selectedRow;
 		RRdrmModel SelectedRow
@@ -149,7 +152,7 @@
 				{
 						selectedRow = value;
 						iTrh = selectedRow.Trh;
-						if (selectedRow.NBK > 0)
+						if (selectedRow.NBK > 0 && usrRrOK)
 								TalepEnabled = true;
 						else
 								TalepEnabled = false;
@@ -187,7 +190,7 @@
 						TalepMsj = $"{aaa.Msj}";
 				else
 						TalepMsj = $"{aaa.Msj} RzrvNo: {aaa.RrID:N0}";
-				
+
 				await Read();
 				StateHasChanged();
 		}
@@ -211,6 +214,8 @@
 		{
 				AaID = MyAppState.getAaID();
 				UuID = MyAppState.getUsrID();
+				usrSkl = MyAppState.getUsrSkl();
+				usrRrOK = MyAppState.getUsrRrOK();
 
 				var aa = await db.LoadData<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
 				int RzrMaxGun = aa[0].RzrMaxGun;
@@ -220,7 +225,12 @@
 				MinDate = Trh;
 				MaxDate = MinDate.AddDays(RzrMaxGun);
 
-				string sql = $"select * from KS where AaID = {AaID} and Aktif = 1";
+				string sql = "";
+				if (usrSkl == "U")
+						sql = $"select * from KS where AaID = {AaID} and UyeRzrOK = 1";
+				else
+						sql = $"select * from KS where AaID = {AaID} and Aktif = 1";
+
 				dataKS = await db.LoadData<KSmodel, dynamic>(sql, new { });
 				KsID = dataKS[0].KsID;
 		}

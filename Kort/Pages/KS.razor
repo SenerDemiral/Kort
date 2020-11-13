@@ -60,13 +60,18 @@
 																	Caption="Aktif?"
 																	ValueUnchecked="0"
 																	ValueChecked="1"
-																	ValueIndeterminate="-1"
 																	 />
+
+				<DxDataGridCheckBoxColumn Field=@nameof(KSmodel.UyeRzrOK)
+																	Caption="ÜyeRzrvsyn?" 
+																	ValueUnchecked="0"
+																	ValueChecked="1"
+																	/>
 
 				<DxDataGridColumn Field=@nameof(KSmodel.Ad)
 													Caption="Ad"
 													EditorVisible="true"
-													AllowGroup="false"/>
+													AllowGroup="false" />
 
 		</Columns>
 
@@ -102,6 +107,12 @@
 
 		async Task OnRowUpdating(KSmodel dataItem, IDictionary<string, object> newValue)
 		{
+				//if (newValue.ContainsKey("DnmOK"))
+				//{
+				//		dataItem.DnmOK = (bool) newValue["DnmOK"];
+				//		newValue.Remove("DnmOK");
+				//		newValue.Add("UyeRzrOK", dataItem.UyeRzrOK);
+				//}
 				await db.UpdateRec(dataItem, newValue);
 		}
 

@@ -10,6 +10,7 @@ namespace DataLibrary.Models
         public int AaID { get; set; }
         public string UsrAd { get; set; } = "";
         public string UsrSkl { get; set; } = "";
+        public int UsrRrOK { get; set; } = 0;
         public string AaAd { get; set; } = "";
     }
 }

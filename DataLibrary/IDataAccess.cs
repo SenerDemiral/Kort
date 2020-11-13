@@ -21,7 +21,7 @@ namespace DataLibrary
 
         int GetTablePK(string tblName);
         int GetPK();
-        (bool ok, string usrAd, int aaID, string usrSkl, string aaAd) Login(int usrID, string pwd);
+        (bool ok, string usrAd, int aaID, string usrSkl, bool usrRrOK, string aaAd) Login(int usrID, string pwd);
 
         void MyTableFieldsCopy<T, U>(T src, U dst, IDictionary<string, object> newValue);
     }

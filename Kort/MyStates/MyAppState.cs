@@ -13,6 +13,7 @@ namespace Kort.MyStates
         private int _usrID = 0;
         private int _aaID = 0;
         private string _usrSkl = "";
+        private bool _usrRrOK = false;
         private string _aaAd = "";
         readonly IDataAccess _dataAccess;
 
@@ -38,12 +39,13 @@ namespace Kort.MyStates
             //var aaa = _dataAccess.GetPK("UST");
 
             //var (ok, ad) = DataLibrary.DbAccess.Login(appState.UsrID, appState.UsrPwd);
-            var (ok, usrAd, aaID, usrSkl, aaAd) = _dataAccess.Login(appState.UsrID, appState.UsrPwd);
+            var (ok, usrAd, aaID, usrSkl, usrRrOK, aaAd) = _dataAccess.Login(appState.UsrID, appState.UsrPwd);
             if (ok)
             {
                 _usrID = appState.UsrID;
                 _usrName = usrAd;
                 _usrSkl = usrSkl;
+                _usrRrOK = usrRrOK;
                 _aaID = aaID;
                 _aaAd = aaAd;
                 StateHasChanged();
@@ -55,6 +57,7 @@ namespace Kort.MyStates
                 _usrName = "";
                 _aaID = 0;
                 _usrSkl = "";
+                _usrRrOK = false;
                 _aaAd = "";
 
                 StateHasChanged();
@@ -94,6 +97,10 @@ namespace Kort.MyStates
         public string getUsrSkl()
         {
             return _usrSkl;
+        }
+        public bool getUsrRrOK()
+        {
+            return _usrRrOK;
         }
         public string getUsrName()
         {

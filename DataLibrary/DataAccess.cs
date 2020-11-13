@@ -206,11 +206,12 @@ namespace DataLibrary
             return pk;
         }
 
-        public (bool ok, string usrAd, int aaID, string usrSkl, string aaAd) Login(int usrID, string pwd)
+        public (bool ok, string usrAd, int aaID, string usrSkl, bool usrRrOK, string aaAd) Login(int usrID, string pwd)
         {
             string ok = "F"; 
             string usrAd = "";
             string usrSkl = "";
+            bool usrRrOK = false;
             int aaID = 0;
             string aaAd = "";
             string sql = "select * from LOGIN(@UsrID, @Pwd)";
@@ -224,9 +225,10 @@ namespace DataLibrary
             usrAd = res.UsrAd;
             aaID = res.AaID;
             usrSkl = res.UsrSkl;
+            usrRrOK = res.UsrRrOK == 1 ? true : false;
             aaAd = res.AaAd;
             //ad = $"{res.UsrAd} #{usrID} @{res.AaAd}";
-            return (ok == "T", usrAd, aaID, usrSkl, aaAd);
+            return (ok == "T", usrAd, aaID, usrSkl, usrRrOK, aaAd);
         }
         public (string tblName, string keyName) MyTableNameAndKey(Type t)
         {
