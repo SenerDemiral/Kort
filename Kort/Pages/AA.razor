@@ -27,38 +27,42 @@
 				</DxToolbar>
 		</HeaderTemplate>
 		<Columns>
+				@if (Editable)
+				{
 				<DxDataGridCommandColumn Width="3em">
 						<HeaderCellTemplate />
 						<CellTemplate>
 								<a class="oi oi-pencil" @onclick="@(() => grid.StartRowEdit(context))" href="javascript:void(0);"></a>
 						</CellTemplate>
 				</DxDataGridCommandColumn>
-
+				}
 				<DxDataGridColumn Field=@nameof(AAmodel.AaID)
 													Caption="ID"
 													Width="6em"
 													TextAlignment="DataGridTextAlign.Center"
-													EditorVisible="false"
-													AllowGroup="false" />
-
-
+													EditorVisible="false" />
 				<DxDataGridColumn Field=@nameof(AAmodel.Ad)
 													Caption="Ad"
-													EditorVisible="false"
-													AllowGroup="false" />
-
+													EditorVisible="false" />
 				<DxDataGridColumn Field=@nameof(AAmodel.Tel)
 													Caption="Tel"
-													EditorVisible="true"
-													AllowGroup="false" />
+													EditorVisible="true" />
 				<DxDataGridColumn Field=@nameof(AAmodel.Mail)
 													Caption="Mail"
-													EditorVisible="true"
-													AllowGroup="false" />
+													EditorVisible="true"/>
+				<DxDataGridSpinEditColumn Field=@nameof(AAmodel.RzrMaxGun)
+													Caption="RzrGün"
+													EditorVisible="true"/>
 				<DxDataGridColumn Field=@nameof(AAmodel.Info)
 													Caption="Info"
-													EditorVisible="true"
-													AllowGroup="false" />
+													Visible="false"
+													EditorVisible="true">
+												  <EditTemplate>
+														<DxMemo Text="@(((string)((CellEditContext)context).CellValue))"
+																	  TextChanged="@((string newCellValue) => ((CellEditContext)context).OnChanged(newCellValue))">
+														</DxMemo>
+													</EditTemplate>
+				</DxDataGridColumn>
 		</Columns>
 
 </DxDataGrid>
@@ -76,49 +80,52 @@
 						InnerComponentSizeMode="SizeMode.Small"
 						CssClass="MyGrid table-striped">
 		<Columns>
-				<DxDataGridCommandColumn Width="3em">
-						<HeaderCellTemplate />
-						<CellTemplate>
-								<a class="oi oi-pencil" @onclick="@(() => grid2.StartRowEdit(context))" href="javascript:void(0);"></a>
-						</CellTemplate>
-				</DxDataGridCommandColumn>
+				@if (Editable)
+				{
+						<DxDataGridCommandColumn Width="3em">
+								<HeaderCellTemplate />
+								<CellTemplate>
+										<a class="oi oi-pencil" @onclick="@(() => grid2.StartRowEdit(context))" href="javascript:void(0);"></a>
+								</CellTemplate>
+						</DxDataGridCommandColumn>
+				}
+						<DxDataGridColumn Field=@nameof(AWmodel.WD)
+															Caption="WD"
+															Width="6em"
+															TextAlignment="DataGridTextAlign.Center"
+															EditorVisible="false" />
 
-				<DxDataGridColumn Field=@nameof(AWmodel.WD)
-													Caption="WD"
-													Width="6em"
-													TextAlignment="DataGridTextAlign.Center"
-													EditorVisible="false" />
+						<DxDataGridColumn Field=@nameof(AWmodel.Ad)
+															Caption="Ad"
+															EditorVisible="false" />
 
-				<DxDataGridColumn Field=@nameof(AWmodel.Ad)
-													Caption="Ad"
-													EditorVisible="false" />
+						<DxDataGridComboBoxColumn Field=@nameof(AWmodel.Bas)
+																			Caption="Başlangıç"
+																			Width="10em"
+																			TextAlignment="DataGridTextAlign.Center"
+																			TextFieldName="Ad"
+																			ValueFieldName="Dak"
+																			Data="@db.ZmnList()">
+						</DxDataGridComboBoxColumn>
 
-				<DxDataGridComboBoxColumn Field=@nameof(AWmodel.Bas)
-																	Caption="Başlangıç"
-																	Width="10em"
-																	TextAlignment="DataGridTextAlign.Center"
-																	TextFieldName="Ad"
-																	ValueFieldName="Dak"
-																	Data="@db.ZmnList()">
-				</DxDataGridComboBoxColumn>
+						<DxDataGridComboBoxColumn Field=@nameof(AWmodel.Bit)
+																			Caption="Bitiş"
+																			Width="10em"
+																			TextAlignment="DataGridTextAlign.Center"
+																			TextFieldName="Ad"
+																			ValueFieldName="Dak"
+																			Data="@db.ZmnList()">
+						</DxDataGridComboBoxColumn>
 
-				<DxDataGridComboBoxColumn Field=@nameof(AWmodel.Bit)
-																	Caption="Bitiş"
-																	Width="10em"
-																	TextAlignment="DataGridTextAlign.Center"
-																	TextFieldName="Ad"
-																	ValueFieldName="Dak"
-																	Data="@db.ZmnList()">
-				</DxDataGridComboBoxColumn>
-
-		</Columns>
+				</Columns>
 
 </DxDataGrid>
 
 @code {
 		private int AaID { get; set; }
 		private int UuID { get; set; }
-		private string UuSkl { get; set; }
+		private string usrSkl { get; set; }
+		bool Editable = false;
 
 		List<AAmodel> data;
 		AAmodel SelectedRow;
@@ -133,6 +140,11 @@
 		protected override async Task OnInitializedAsync()
 		{
 				AaID = MyAppState.getAaID();
+				usrSkl = MyAppState.getUsrSkl();
+
+				if (usrSkl == "A")
+						Editable = true;
+
 				string sql = $"select * from AA where AaID = {AaID}";
 				data = await db.LoadData<AAmodel, dynamic>(sql, new { });
 

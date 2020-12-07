@@ -7,7 +7,7 @@
 				<DxTreeViewNode NavigateUrl="" Text="" IconCssClass="oi oi-home mb-0"></DxTreeViewNode>
 				@if (usrID > 0)
 				{
-						<DxTreeViewNode NavigateUrl="rrdrm" Text="Kort Durumu" BadgeText="D"></DxTreeViewNode>
+						<DxTreeViewNode NavigateUrl="rrdrm2" Text="Kort Durumu" BadgeText="D"></DxTreeViewNode>
 						@if (usrSkl == "A")
 						{
 								<DxTreeViewNode NavigateUrl="aa" Text="Kulüp" BadgeText="A"></DxTreeViewNode>
@@ -16,6 +16,17 @@
 								<DxTreeViewNode NavigateUrl="tg" Text="Etiketler" BadgeText="E"></DxTreeViewNode>
 								<DxTreeViewNode NavigateUrl="kk" Text="Kortlar" BadgeText="K"></DxTreeViewNode>
 								<DxTreeViewNode NavigateUrl="ks" Text="Kort Şekli" BadgeText="T"></DxTreeViewNode>
+						}
+						@if (usrSkl == "Y")
+						{
+								<DxTreeViewNode NavigateUrl="uu" Text="Kişiler" BadgeText="U"></DxTreeViewNode>
+								<DxTreeViewNode NavigateUrl="rr" Text="Rezervasyon" BadgeText="R"></DxTreeViewNode>
+								<DxTreeViewNode NavigateUrl="tg" Text="Etiketler" BadgeText="E"></DxTreeViewNode>
+						}
+						@if (usrSkl == "H")
+						{
+								<DxTreeViewNode NavigateUrl="uu" Text="Kişiler" BadgeText="U"></DxTreeViewNode>
+								<DxTreeViewNode NavigateUrl="rr" Text="Rezervasyon" BadgeText="R"></DxTreeViewNode>
 						}
 				}
 		</Nodes>

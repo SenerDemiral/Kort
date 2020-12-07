@@ -50,6 +50,8 @@
 		</HeaderTemplate>
 
 		<Columns>
+								@if (Editable)
+								{
 				<DxDataGridCommandColumn Width="3em">
 						<HeaderCellTemplate>
 								<a class="oi oi-plus" @onclick="@(() => grid.StartRowEdit(null))" href="javascript:void(0);"></a>
@@ -58,7 +60,7 @@
 								<a class="oi oi-pencil" @onclick="@(() => grid.StartRowEdit(context))" href="javascript:void(0);"></a>
 						</CellTemplate>
 				</DxDataGridCommandColumn>
-
+								}
 
 				<DxDataGridColumn Field=@nameof(UUmodel.UuID)
 													Caption="ID"
@@ -224,9 +226,11 @@
 
 								<DxFormLayoutItem Caption="Şkl" ColSpanMd="4" Context="FormLayoutContext">
 										<Template>
-												<DxComboBox @bind-Value="@EditContext.Skl"
+												<DxComboBox Value="@EditContext.Skl"
 																		TextFieldName="Ad"
 																		ValueFieldName="Skl"
+																		ValueExpression="@(() => EditContext.Skl )"
+																		ValueChanged="@((string Skl) => OnUuSklChanged(Skl))"
 																		Data="@db.UuSklList()" />
 										</Template>
 								</DxFormLayoutItem>
@@ -374,6 +378,9 @@
 		bool ShowFilterRow = false;
 		//KTmodel SelectedRow;
 		int AaID = -1;
+		private string usrSkl = "";
+		bool Editable = false;
+
 
 		int PageIndex { get; set; } = 0;
 
@@ -399,6 +406,14 @@
 				MyAppState.curUuPageIndex = newPageIndex;
 		}
 
+		void OnUuSklChanged(string Skl)
+		{
+				if(usrSkl == "A" && Skl != "A")
+						EditContext.Skl = Skl;
+				if (usrSkl == "Y" && Skl != "A" && Skl != "Y")
+						EditContext.Skl = Skl;
+		}
+
 		async Task OnTgFilterClick()
 		{
 				string filter = "";
@@ -413,6 +428,10 @@
 		protected override async Task OnInitializedAsync()
 		{
 				AaID = MyAppState.getAaID();
+				usrSkl = MyAppState.getUsrSkl();
+
+				if (usrSkl == "A" || usrSkl == "Y")
+						Editable = true;
 
 				//string sql = $"select * from UU where AaID = {AaID}";
 				string sql = $"select * from UU_S({AaID})";

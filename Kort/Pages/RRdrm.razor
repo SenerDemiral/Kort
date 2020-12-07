@@ -22,8 +22,18 @@
 
 						<DxFormLayoutItem Caption="Süre" ColSpanMd="3">
 								<Template>
-										<DxComboBox @bind-Value="@Sure"
-																Data="@(new int[] { 60, 90, 120 })" />
+										@if (usrSkl == "U")
+										{
+												<DxComboBox @bind-Value="@Sure"
+																		Data="@(new int[] { 60, 120 })" 
+																		FilteringMode="DataGridFilteringMode.StartsWith" />
+										}
+										else
+										{
+												<DxComboBox @bind-Value="@Sure"
+																		Data="@(new int[] { 60, 90, 120, 180, 240, 300 })"
+																		FilteringMode="DataGridFilteringMode.StartsWith"/>
+										}
 								</Template>
 						</DxFormLayoutItem>
 
@@ -33,6 +43,7 @@
 																NullText="Kort Seçin..."
 																TextFieldName="Ad"
 																ValueFieldName="KsID"
+																FilteringMode="DataGridFilteringMode.Contains"
 																Data="@dataKS" />
 								</Template>
 						</DxFormLayoutItem>
@@ -104,30 +115,30 @@
 
 @if (usrRrOK)
 {
-<div class="card">
-		<h5 class="card-header">Rezervasyon</h5>
-		<div class="card-body">
-				<DxFormLayout ItemSizeMode="SizeMode.Small">
-						<DxFormLayoutItem Caption="Tarih" ColSpanMd="12">
-								<Template>
-										<DxTextBox Text="@iTrh?.ToString("dd MMMM dddd HH:mm")" ReadOnly="true" />
-								</Template>
-						</DxFormLayoutItem>
+		<div class="card">
+				<h5 class="card-header">Rezervasyon</h5>
+				<div class="card-body">
+						<DxFormLayout ItemSizeMode="SizeMode.Small">
+								<DxFormLayoutItem Caption="Tarih" ColSpanMd="12">
+										<Template>
+												<DxTextBox Text="@iTrh?.ToString("dd MMMM dddd HH:mm")" ReadOnly="true" />
+										</Template>
+								</DxFormLayoutItem>
 
-						<DxFormLayoutItem ColSpanMd="4" BeginRow="true">
-								<Template>
-										<DxButton RenderStyle="ButtonRenderStyle.Warning" Click="@RrTalep" Text="Rezervasyon Talep" Enabled="TalepEnabled" />
-								</Template>
-						</DxFormLayoutItem>
+								<DxFormLayoutItem ColSpanMd="4" BeginRow="true">
+										<Template>
+												<DxButton RenderStyle="ButtonRenderStyle.Warning" Click="@RrTalep" Text="Rezervasyon Talep" Enabled="TalepEnabled" />
+										</Template>
+								</DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Talep Sonucu" ColSpanMd="12" BeginRow="true">
-								<Template>
-										<DxTextBox Text='@TalepMsj' ReadOnly="true" />
-								</Template>
-						</DxFormLayoutItem>
-				</DxFormLayout>
+								<DxFormLayoutItem Caption="Talep Sonucu" ColSpanMd="12" BeginRow="true">
+										<Template>
+												<DxTextBox Text='@TalepMsj' ReadOnly="true" />
+										</Template>
+								</DxFormLayoutItem>
+						</DxFormLayout>
+				</div>
 		</div>
-</div>
 }
 
 
@@ -186,12 +197,10 @@
 				RRtalepModel aaa = await db.LoadRec<RRtalepModel, dynamic>(sql, p);
 
 				TalepRrID = aaa.RrID;
-				if (TalepRrID == 0)
-						TalepMsj = $"{aaa.Msj}";
-				else
-						TalepMsj = $"{aaa.Msj} RzrvNo: {aaa.RrID:N0}";
+				TalepMsj = $"{aaa.Msj}";
 
-				await Read();
+				if (TalepRrID > 0)
+						await Read();
 				StateHasChanged();
 		}
 
@@ -217,19 +226,25 @@
 				usrSkl = MyAppState.getUsrSkl();
 				usrRrOK = MyAppState.getUsrRrOK();
 
-				var aa = await db.LoadData<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
-				int RzrMaxGun = aa[0].RzrMaxGun;
+				//var aa = await db.LoadData<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
+				//int RzrMaxGun = aa[0].RzrMaxGun;
+
+				var aaRec = await db.LoadRec<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
+				int RzrMaxGun = aaRec.RzrMaxGun;
 
 				//Trh = DateTime.Today;
 				Trh = new DateTime(2020, 11, 11, 8, 0, 0);  // 11inde kayit var onu gormek icin, simdilik
 				MinDate = Trh;
-				MaxDate = MinDate.AddDays(RzrMaxGun);
+				if (usrSkl == "U")
+						MaxDate = MinDate.AddDays(RzrMaxGun);
+				else
+						MaxDate = MinDate.AddYears(1);
 
 				string sql = "";
-				if (usrSkl == "U")
-						sql = $"select * from KS where AaID = {AaID} and UyeRzrOK = 1";
-				else
+				if (usrSkl == "A" || usrSkl == "Y" || usrSkl == "H")    // Admin, Yetkili, Hoca
 						sql = $"select * from KS where AaID = {AaID} and Aktif = 1";
+				else
+						sql = $"select * from KS where AaID = {AaID} and UyeRzrOK = 1";
 
 				dataKS = await db.LoadData<KSmodel, dynamic>(sql, new { });
 				KsID = dataKS[0].KsID;

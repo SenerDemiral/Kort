@@ -50,12 +50,13 @@ namespace DataLibrary
             };
 
             uuSklList = new List<SklModel>() {
-                new SklModel { Skl = "U", Ad = "Üye" },
+                new SklModel { Skl = "M", Ad = "Misafir" },
                 new SklModel { Skl = "O", Ad = "Öğrenci" },
                 new SklModel { Skl = "G", Ad = "Grup" },
-                new SklModel { Skl = "M", Ad = "Misafir" },
-                new SklModel { Skl = "A", Ad = "Admin" },
+                new SklModel { Skl = "U", Ad = "Üye" },
                 new SklModel { Skl = "H", Ad = "Hoca" },
+                new SklModel { Skl = "Y", Ad = "Yetkili" },
+                new SklModel { Skl = "A", Ad = "Admin" },
             };
 
             tgSklList = new List<SklModel>() {
