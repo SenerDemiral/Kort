@@ -15,6 +15,7 @@ namespace DataLibrary.Models
         public int AaID { get; set; }
         public int UuID { get; set; }
         public int KsID { get; set; }
+        public int KkID { get; set; }
         public string Drm { get; set; }
         public string Info { get; set; }
         public DateTime BasTrh { get; set; }

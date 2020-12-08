@@ -57,7 +57,7 @@
 
 						<DxFormLayoutItem ColSpanMd="2" BeginRow="true">
 								<Template>
-										<DxButton RenderStyle="ButtonRenderStyle.Warning" Click="@RrTalep" Text="Rezervasyon Talep" Enabled="TalepEnabled" />
+										<DxButton RenderStyle="ButtonRenderStyle.Warning" Click="@RrTalepKort" Text="Rezervasyon Talep" Enabled="TalepEnabled" />
 								</Template>
 						</DxFormLayoutItem>
 
@@ -127,55 +127,28 @@
 </DxPopup>
 
 @code {
+		private int AaID { get; set; }
+		private int UuID { get; set; }
+
 		bool PopupVisible { get; set; } = false;
 		string RrInfoHdr = "";
 		string RrInfoContetnt = "";
 
-		private async Task RrKim(MouseEventArgs e, int vm)
-		{
-				string aaa = await db.LoadRec<string, dynamic>($"select RrInfo from RR_INFO({vm})", new { });
-
-				RrInfoHdr = $"Rezervasyon# {vm}";
-				RrInfoContetnt = aaa;
-				PopupVisible = true;
-		}
-
-		private int AaID { get; set; }
-		private int UuID { get; set; }
-
-		List<KSmodel> dataKS;
-		List<KKmodel> dataKK;
-
 		Dictionary<int, RRdrm2ViewModel> dataView = new Dictionary<int, RRdrm2ViewModel>();
 		List<RRdrm2HdrModel> dataHdr;
-		List<RRdrm2Model> data;
 		List<string> dataBasZmn;
+		List<KKmodel> dataKK;
 
 		int DimX = 0;
 		int DimY = 0;
 
-		DateTime? iTrh;
-		bool TalepEnabled = false;
+		//DateTime? iTrh;
+		bool TalepEnabled = true;
 		string TalepMsj = "";
 		int TalepRrID = 0;
 		string usrSkl = "";
 		bool usrRrOK = false;
 
-		RRdrmModel selectedRow;
-		RRdrmModel SelectedRow
-		{
-				get { return selectedRow; }
-				set
-				{
-						selectedRow = value;
-						iTrh = selectedRow.Trh;
-						if (selectedRow.NBK > 0 && usrRrOK)
-								TalepEnabled = true;
-						else
-								TalepEnabled = false;
-						StateHasChanged();
-				}
-		}
 
 		DateTime trh;
 		DateTime Trh
@@ -198,18 +171,29 @@
 		int Sure = 60;
 		int Period = 60;
 
-		async Task RrTalep()
+		private async Task RrKim(MouseEventArgs e, int vm)
+		{
+				string aaa = await db.LoadRec<string, dynamic>($"select RrInfo from RR_INFO({vm})", new { });
+
+				RrInfoHdr = $"Rezervasyon# {vm}";
+				RrInfoContetnt = aaa;
+				PopupVisible = true;
+		}
+
+		async Task RrTalepKort()
 		{
 				dynamic p = new
 				{
 						AaID = AaID,
 						UuID = UuID,
-						Trh = SelectedRow.Trh,
+						Trh = Trh,
+						ZmnTxt = BasZmn,
 						Sure = Sure,
-						KsID = KsID,
+						KkID = KkID,
+						UuIDs = ""
 				};
 
-				string sql = $"select * from RR_TALEP(@AaID, @UuID,  @Trh, @Sure, @KsID)";
+				string sql = $"select * from RR_TALEP_KORT(@AaID, @UuID,  @Trh, @ZmnTxt, @Sure, @KkID, @UuIDs)";
 				RRtalepModel aaa = await db.LoadRec<RRtalepModel, dynamic>(sql, p);
 
 				TalepRrID = aaa.RrID;
@@ -238,7 +222,9 @@
 
 				sql = $"select ZmnTxt from RR_TALEP_ZMNTXT(@AaID, @UuID, @Trh)";
 				dataBasZmn = await db.LoadData<string, dynamic>(sql, new { AaID = AaID, UuID = UuID, Trh = Trh });
-				BasZmn = dataBasZmn[0];
+				
+				if(string.IsNullOrEmpty(BasZmn))
+						BasZmn = dataBasZmn[0];
 
 				RRdrm2ViewModel vm = null;
 				dataView.Clear();
@@ -284,18 +270,8 @@
 				else
 						MaxDate = MinDate.AddYears(1);
 
-				string sql = "";
-				if (usrSkl == "A" || usrSkl == "Y" || usrSkl == "H")    // Admin, Yetkili, Hoca
-						sql = $"select * from KS where AaID = {AaID} and Aktif = 1";
-				else
-						sql = $"select * from KS where AaID = {AaID} and UyeRzrOK = 1";
-
-				dataKS = await db.LoadData<KSmodel, dynamic>(sql, new { });
-				KsID = dataKS[0].KsID;
-
 				dataKK = await db.LoadData<KKmodel, dynamic>($"select * from KK where AaID = {AaID}", new { });
 				KkID = dataKK[0].KkID;
-
 		}
 
 }

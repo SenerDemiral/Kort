@@ -70,7 +70,7 @@
 																	Data="@db.RrDrmList()">
 				</DxDataGridComboBoxColumn>
 
-				<DxDataGridComboBoxColumn Field=@nameof(RRmodel.KsID)
+				<DxDataGridComboBoxColumn Field=@nameof(RRmodel.KkID)
 																	Caption="Kort"
 																	Width="10em"
 																	SortOrder="DataGridColumnSortOrder.Ascending"
@@ -78,8 +78,8 @@
 																	GroupIndex="@GroupIndex"
 																	TextAlignment="DataGridTextAlign.Center"
 																	TextFieldName="Ad"
-																	ValueFieldName="KsID"
-																	Data="@dataKS">
+																	ValueFieldName="KkID"
+																	Data="@dataKK">
 				</DxDataGridComboBoxColumn>
 
 				<DxDataGridDateEditColumn Field=@nameof(RRmodel._BasTrhD)
@@ -119,8 +119,23 @@
 
 				<DxDataGridColumn Field=@nameof(RRmodel.UuADs)
 													Caption="Oyuncular"
-													EditorVisible="false"
-													AllowGroup="false" />
+													EditorVisible="true"
+													AllowGroup="false" >
+						<EditTemplate>
+								@{ 
+										var aaa = ((context as CellEditContext).DataItem as RRmodel).SelectedUuIDs;
+										//var inStock = (context as RRmodel).SelectedUuIDs;
+
+								<DxTagBox Data="@dataUUL"
+													TextFieldName="Ad"
+													ValueFieldName="IDS"
+													@bind-Values="@(((context as CellEditContext).DataItem as RRmodel).SelectedUuIDs)"
+													ListRenderMode="ListRenderMode.Virtual"
+													ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+								</DxTagBox>
+										}
+						</EditTemplate>
+				</DxDataGridColumn>
 		</Columns>
 
 </DxDataGrid>
@@ -135,6 +150,9 @@
 		RRmodel SelectedRow;
 		DxDataGrid<RRmodel> grid;
 		List<KSmodel> dataKS;
+		List<KKmodel> dataKK;
+		List<UULmodel> dataUUL;
+
 
 		private int GroupIndex { get; set; } = -1;
 
@@ -144,13 +162,25 @@
 				string sql = $"select * from RR_S({AaID})";
 				data = await db.LoadData<RRmodel, dynamic>(sql, new { });
 
-				string sql2 = $"select * from KS where AaID = {AaID}";
-				dataKS = await db.LoadData<KSmodel, dynamic>(sql2, new { });
+				sql = $"select * from KS where AaID = {AaID}";
+				dataKS = await db.LoadData<KSmodel, dynamic>(sql, new { });
+
+				sql = $"select * from KK where AaID = {AaID}";
+				dataKK = await db.LoadData<KKmodel, dynamic>(sql, new { });
+
+				sql = $"select * from UUL({AaID})";
+				dataUUL = await db.LoadData<UULmodel, dynamic>(sql, new { });
 		}
 
 		async Task OnRowUpdating(RRmodel dataItem, IDictionary<string, object> newValue)
 		{
+				newValue.Add("UuIDs", dataItem.UuIDs);
 				await db.UpdateRec(dataItem, newValue);
+
+
+				var rec = await db.LoadRec<RRmodel, dynamic>($"select UuADs from RR_S({AaID}, {SelectedRow.RrID})", new { });
+				SelectedRow.UuADs = rec.UuADs;
+				await grid.Refresh();
 		}
 
 		Task OnInitNewRow(Dictionary<string, object> values)
