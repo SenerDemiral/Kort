@@ -1,0 +1,119 @@
+﻿@page "/rrrpr"
+
+@inject NavigationManager NavigationManager
+@inject IDataAccess db
+@inject MyAppState MyAppState
+
+<h4><span class="badge badge-info"> Günlük Rezervasyon Raporu </span></h4>
+
+<DxDateEdit @bind-Date="@Trh"
+						Format="dd.MM.yy"
+						DisplayFormat="dddd dd.MM.yy"
+						TimeSectionVisible="false"></DxDateEdit>
+
+<br />
+
+<DxDataGrid @ref="@grid"
+						Data="@data"
+						ShowFilterRow="@ShowFilterRow"
+						InnerComponentSizeMode="SizeMode.Small"
+						ShowGroupPanel="true"
+						ShowPager="true"
+						PagerPageSizeSelectorVisible="true"
+						PagerAllDataRowsItemVisible="true"
+						PageSize="20"
+						PagerAllowedPageSizes=@(new int[] { 5, 10, 20, 40 })
+						PagerNavigationMode=PagerNavigationMode.InputBox
+						CssClass="MyGrid table-striped">
+		<HeaderTemplate>
+				<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+						<DxToolbarItem Text="Filter Row"
+													 BeginGroup="true"
+													 GroupName="FilterRow"
+													 Click="@OnShowFilterRow"
+													 IconCssClass="oi oi-eye" />
+						<DxToolbarItem Text="@(MyAppState.getAaAd())"
+													 BeginGroup="true"
+													 Alignment="ToolbarItemAlignment.Right"
+													 CssClass="font-italic"
+													 Enabled="false" />
+				</DxToolbar>
+		</HeaderTemplate>
+		<Columns>
+				<DxDataGridColumn Field=@nameof(RrRprModel.RrID)
+													Caption="ID"
+													Width="6em"
+													AllowGroup="true" />
+
+				<DxDataGridColumn Field=@nameof(RrRprModel.Drm)
+													Caption="Durum"
+													TextAlignment="DataGridTextAlign.Center"
+													Width="6em"
+													AllowGroup="true" />
+
+				<DxDataGridColumn Field=@nameof(RrRprModel.KkAd)
+													Caption="Kort"
+													AllowGroup="true" />
+				<DxDataGridDateEditColumn Field=@nameof(RrRprModel.BasTrh)
+													Caption="Tarih"
+													TextAlignment="DataGridTextAlign.Center"
+						  						DisplayFormat="HH:mm"
+													AllowGroup="true" />
+				<DxDataGridColumn Field=@nameof(RrRprModel.Sure)
+													Caption="Süre"
+													TextAlignment="DataGridTextAlign.Center"
+													AllowGroup="true" />
+				<DxDataGridColumn Field=@nameof(RrRprModel.UuAd)
+													Caption="Düzenleyen"
+													AllowGroup="true" />
+				<DxDataGridColumn Field=@nameof(RrRprModel.OyAd)
+													Caption="Oyuncu"
+													AllowGroup="true" />
+		</Columns>
+
+</DxDataGrid>
+
+
+@code {
+		private int AaID { get; set; }
+		private int UuID { get; set; }
+		private string UuSkl { get; set; }
+
+		List<RrRprModel> data;
+		KSmodel SelectedRow;
+		DxDataGrid<RrRprModel> grid;
+		bool ShowFilterRow = false;
+
+		private int GroupIndex { get; set; } = -1;
+
+		DateTime trh = DateTime.Today;
+		DateTime Trh
+		{
+				get { return trh; }
+				set
+				{
+						trh = value;
+						InvokeAsync(Read);
+						InvokeAsync(StateHasChanged);
+				}
+		}
+
+
+		void OnShowFilterRow(ToolbarItemClickEventArgs e)
+		{
+				ShowFilterRow = !ShowFilterRow;
+		}
+
+		async Task Read()
+		{
+				AaID = MyAppState.getAaID();
+				dynamic p = new
+				{
+						AaID = AaID,
+						Trh = Trh
+				};
+				string sql = $"select * from RR_RPR(@AaID, @Trh)";
+				data = await db.LoadData<RrRprModel, dynamic>(sql, p);
+		}
+
+}

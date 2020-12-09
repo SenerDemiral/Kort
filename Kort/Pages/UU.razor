@@ -50,17 +50,17 @@
 		</HeaderTemplate>
 
 		<Columns>
-								@if (Editable)
-								{
-				<DxDataGridCommandColumn Width="3em">
-						<HeaderCellTemplate>
-								<a class="oi oi-plus" @onclick="@(() => grid.StartRowEdit(null))" href="javascript:void(0);"></a>
-						</HeaderCellTemplate>
-						<CellTemplate>
-								<a class="oi oi-pencil" @onclick="@(() => grid.StartRowEdit(context))" href="javascript:void(0);"></a>
-						</CellTemplate>
-				</DxDataGridCommandColumn>
-								}
+				@if (Editable)
+				{
+						<DxDataGridCommandColumn Width="3em">
+								<HeaderCellTemplate>
+										<a class="oi oi-plus" @onclick="@(() => grid.StartRowEdit(null))" href="javascript:void(0);"></a>
+								</HeaderCellTemplate>
+								<CellTemplate>
+										<a class="oi oi-pencil" @onclick="@(() => grid.StartRowEdit(context))" href="javascript:void(0);"></a>
+								</CellTemplate>
+						</DxDataGridCommandColumn>
+				}
 
 				<DxDataGridColumn Field=@nameof(UUmodel.UuID)
 													Caption="ID"
@@ -129,6 +129,10 @@
 																	DisplayFormat="dd.MM.yy"
 																	TextAlignment="DataGridTextAlign.Center" />
 
+				<DxDataGridCheckBoxColumn Field=@nameof(UUmodel.RrOK)
+																	Caption="Rzrv?"
+																	ValueUnchecked="0"
+																	ValueChecked="1" />
 		</Columns>
 
 		<TotalSummary>

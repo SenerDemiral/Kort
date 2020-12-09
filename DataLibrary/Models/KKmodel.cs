@@ -13,8 +13,11 @@ namespace DataLibrary.Models
         public int KkID { get; set; }
         public int AaID { get; set; }
         public int KsID { get; set; }
+        public int? UyeOK { get; set; }
 
         [StringLength(20)]
         public string Ad { get; set; }
+        [NotMapped]
+        public string Info { get; set; }
     }
 }

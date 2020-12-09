@@ -56,17 +56,12 @@
 													TextAlignment="DataGridTextAlign.Center"
 													EditorVisible="false"
 													AllowGroup="false" />
+
 				<DxDataGridCheckBoxColumn Field=@nameof(KSmodel.Aktif)
 																	Caption="Aktif?"
+																	Width="10em"
 																	ValueUnchecked="0"
-																	ValueChecked="1"
-																	 />
-
-				<DxDataGridCheckBoxColumn Field=@nameof(KSmodel.UyeRzrOK)
-																	Caption="ÜyeRzrvsyn?" 
-																	ValueUnchecked="0"
-																	ValueChecked="1"
-																	/>
+																	ValueChecked="1"/>
 
 				<DxDataGridColumn Field=@nameof(KSmodel.Ad)
 													Caption="Ad"

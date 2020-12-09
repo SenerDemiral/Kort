@@ -20,18 +20,18 @@
 								</Template>
 						</DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Kort" ColSpanMd="4" BeginRow="true">
+						<DxFormLayoutItem Caption="Kort" ColSpanMd="4" >
 								<Template>
 										<DxComboBox @bind-Value="@KkID"
 																NullText="Kort Seçin..."
-																TextFieldName="Ad"
+																TextFieldName="Info"
 																ValueFieldName="KkID"
 																FilteringMode="DataGridFilteringMode.Contains"
 																Data="@dataKK" />
 								</Template>
 						</DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Saat" ColSpanMd="4">
+						<DxFormLayoutItem Caption="Saat" ColSpanMd="2">
 								<Template>
 										<DxComboBox @bind-Value="@BasZmn"
 																DisplayFormat="HH:mm"
@@ -40,7 +40,7 @@
 								</Template>
 						</DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Süre" ColSpanMd="4">
+						<DxFormLayoutItem Caption="Süre" ColSpanMd="2">
 								<Template>
 										@if (usrSkl == "U")
 										{
@@ -61,7 +61,7 @@
 								</Template>
 						</DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Talep Sonucu" ColSpanMd="10">
+						<DxFormLayoutItem Caption="Sonuc" ColSpanMd="10">
 								<Template>
 										<DxTextBox Text='@TalepMsj' ReadOnly="true" />
 								</Template>
@@ -70,11 +70,6 @@
 				</DxFormLayout>
 		</div>
 </div>
-
-<br />
-@*<DxToolbarItem Text="@(Trh.ToString("dd.MM.yy dddd"))"*@
-
-<br />
 
 @if (dataView.Count > 0)
 {
@@ -167,9 +162,7 @@
 
 
 		int KkID = 0;
-		int KsID = 0;
 		int Sure = 60;
-		int Period = 60;
 
 		private async Task RrKim(MouseEventArgs e, int vm)
 		{
@@ -190,10 +183,11 @@
 						ZmnTxt = BasZmn,
 						Sure = Sure,
 						KkID = KkID,
+						Info = "",
 						UuIDs = ""
 				};
 
-				string sql = $"select * from RR_TALEP_KORT(@AaID, @UuID,  @Trh, @ZmnTxt, @Sure, @KkID, @UuIDs)";
+				string sql = $"select * from RR_TALEP_KORT(@AaID, @UuID,  @Trh, @ZmnTxt, @Sure, @KkID, @Info, @UuIDs)";
 				RRtalepModel aaa = await db.LoadRec<RRtalepModel, dynamic>(sql, p);
 
 				TalepRrID = aaa.RrID;
@@ -209,19 +203,20 @@
 				dynamic p = new
 				{
 						AaID = AaID,
+						UuID = UuID,
 						Trh = Trh
 				};
 
-				string sql = $"select * from RR_DRM_HDR(@AaID, @Trh)";
+				string sql = $"select * from RR_DRM_HDR(@AaID, @UuID, @Trh)";
 				dataHdr = await db.LoadData<RRdrm2HdrModel, dynamic>(sql, p);
 				DimX = dataHdr.Count;
 				DimY = dataHdr[0].DimY;
 
-				sql = $"select * from RR_DRM(@AaID, @Trh)";
+				sql = $"select * from RR_DRM(@AaID, @UuID, @Trh)";
 				var data = await db.LoadData<RRdrm2Model, dynamic>(sql, p);
 
 				sql = $"select ZmnTxt from RR_TALEP_ZMNTXT(@AaID, @UuID, @Trh)";
-				dataBasZmn = await db.LoadData<string, dynamic>(sql, new { AaID = AaID, UuID = UuID, Trh = Trh });
+				dataBasZmn = await db.LoadData<string, dynamic>(sql, p);
 				
 				if(string.IsNullOrEmpty(BasZmn))
 						BasZmn = dataBasZmn[0];
