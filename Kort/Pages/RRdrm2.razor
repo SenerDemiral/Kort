@@ -10,350 +10,355 @@
 @*<h4><span class="badge badge-info"> Kort Durumu & Rezervasyon </span></h4>*@
 
 <div class="card">
-		<h5 class="card-header">Kort Rezervasyon</h5>
-		<div class="card-body">
-				<DxFormLayout ItemSizeMode="SizeMode.Small">
-						<DxFormLayoutItem Caption="Tarih" ColSpanMd="4">
-								<Template>
-										<DxDateEdit @bind-Date="@Trh"
-																Format="dd.MM.yy"
-																DisplayFormat="dddd dd.MM.yy"
-																MinDate="@MinDate"
-																MaxDate="@MaxDate"
-																TimeSectionVisible="false"></DxDateEdit>
-								</Template>
-						</DxFormLayoutItem>
+    <h5 class="card-header">Kort Rezervasyon</h5>
+    <div class="card-body">
+        <DxFormLayout ItemSizeMode="SizeMode.Small">
+            <DxFormLayoutItem Caption="Tarih" ColSpanMd="4">
+                <Template>
+                    <DxDateEdit @bind-Date="@Trh"
+                                Format="dd.MM.yy"
+                                DisplayFormat="dddd dd.MM.yy"
+                                MinDate="@MinDate"
+                                MaxDate="@MaxDate"
+                                TimeSectionVisible="false"></DxDateEdit>
+                </Template>
+            </DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Kort" ColSpanMd="4">
-								<Template>
-										<DxComboBox @bind-Value="@KkID"
-																NullText="Kort Seçin..."
-																TextFieldName="Info"
-																ValueFieldName="KkID"
-																FilteringMode="DataGridFilteringMode.Contains"
-																Data="@dataKK" />
-								</Template>
-						</DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Saat" ColSpanMd="2">
+                <Template>
+                    <DxComboBox @bind-Value="@BasZmn"
+                                DisplayFormat="HH:mm"
+                                FilteringMode="DataGridFilteringMode.StartsWith"
+                                Data="@dataBasZmn" />
+                </Template>
+            </DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Saat" ColSpanMd="2">
-								<Template>
-										<DxComboBox @bind-Value="@BasZmn"
-																DisplayFormat="HH:mm"
-																FilteringMode="DataGridFilteringMode.StartsWith"
-																Data="@dataBasZmn" />
-								</Template>
-						</DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Kort" ColSpanMd="4">
+                <Template>
+                    <DxComboBox @bind-Value="@KkID"
+                                NullText="Kort Seçin..."
+                                TextFieldName="Info"
+                                ValueFieldName="KkID"
+                                FilteringMode="DataGridFilteringMode.Contains"
+                                Data="@dataKK" />
+                </Template>
+            </DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Süre" ColSpanMd="2">
-								<Template>
-										@if (usrSkl == "U")
-										{
-												<DxComboBox @bind-Value="@Sure"
-																		Data="@(new int[] { 60, 120 })" />
-										}
-										else
-										{
-												<DxComboBox @bind-Value="@Sure"
-																		Data="@(new int[] { 60, 90, 120, 180, 240, 300 })" />
-										}
-								</Template>
-						</DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Süre" ColSpanMd="2">
+                <Template>
+                    @if (usrSkl == "U")
+                    {
+                        <DxComboBox @bind-Value="@Sure"
+                                    Data="@(new int[] { 60, 120 })" />
+                    }
+                    else
+                    {
+                        <DxComboBox @bind-Value="@Sure"
+                                    Data="@(new int[] { 60, 90, 120, 180, 240, 300 })" />
+                    }
+                </Template>
+            </DxFormLayoutItem>
 
-						<DxFormLayoutItem ColSpanMd="2" BeginRow="true">
-								<Template>
-										<DxButton RenderStyle="ButtonRenderStyle.Warning" Click="@RrTalepKort" Text="Rezervasyon Talep" Enabled="TalepEnabled" />
-								</Template>
-						</DxFormLayoutItem>
+            <DxFormLayoutItem ColSpanMd="2" BeginRow="true">
+                <Template>
+                    <DxButton RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="ButtonRenderStyleMode.Outline" IconCssClass="oi oi-share" IconPosition="ButtonIconPosition.AfterText" Click="@RrTalepKort" Text="Rezervasyon Talep" Enabled="TalepEnabled" />
+                </Template>
+            </DxFormLayoutItem>
 
-						<DxFormLayoutItem Caption="Sonuc" ColSpanMd="10">
-								<Template>
-										<DxTextBox Text='@TalepMsj' ReadOnly="true" />
-								</Template>
-						</DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Sonuç" ColSpanMd="10">
+                <Template>
+                    <DxTextBox Text='@TalepMsj' ReadOnly="true" InputCssClass="@TalepMsjClass" />
+                </Template>
+            </DxFormLayoutItem>
 
-				</DxFormLayout>
-		</div>
+        </DxFormLayout>
+    </div>
 </div>
 
 @if (dataView.Count > 0)
 {
+    <table class="table table-bordered table-hover table-sm">
+        <thead class="thead-dark">
+            <tr>
+                <th style="width:50px"></th>
+                @foreach (var H in dataHdr)
+                {
+                    <th class="text-center"><b>@H.KkAd</b></th>
+                }
+            </tr>
 
-		<table class="table table-bordered table-hover table-sm">
-				<thead class="thead-dark">
-						<tr>
-								<th style="width:50px"></th>
-								@foreach (var H in dataHdr)
-								{
-										<th class="text-center"><b>@H.KkAd</b></th>
-								}
-						</tr>
-
-				</thead>
-				<tbody>
-						@foreach (var Y in dataView)
-						{
-								<tr>
-										@if (Y.Value.Zmn.Minute == 0)
-										{
-												<td class="text-center p-0" style="position: relative; top: -12px;"><span class="badge badge-info">@Y.Value.Zmn.ToString("HH:mm")</span></td>
-										}
-										else
-										{
-												<td class="text-center p-0"><span class="badge badge-light" style="position: relative; top: -12px;">@Y.Value.Zmn.ToString("HH:mm")</span> </td>
-										}
-										@foreach (var X in Y.Value.RrID)
-										{
-												<td class="text-center p-0">
-														@if (X.Value > 0)
-														{
-																<span class="btn btn-link btn-sm p-0" @onclick="@(e => RrKim(e, X.Value))">@X.Value.ToString("#")</span>
-														}
-												</td>
-										}
-								</tr>
-						}
-				</tbody>
-		</table>
+        </thead>
+        <tbody>
+            @foreach (var Y in dataView)
+            {
+                <tr>
+                    @if (Y.Value.Zmn.Minute == 0)
+                    {
+                        <td class="text-center p-0" style="position: relative; top: -12px;"><span class="badge badge-info">@Y.Value.Zmn.ToString("HH:mm")</span></td>
+                    }
+                    else
+                    {
+                        <td class="text-center p-0"><span class="badge badge-light" style="position: relative; top: -12px;">@Y.Value.Zmn.ToString("HH:mm")</span> </td>
+                    }
+                    @foreach (var X in Y.Value.RrID)
+                    {
+                        <td class="text-center p-0">
+                            @if (X.Value > 0)
+                            {
+                                <span class="btn btn-link btn-sm p-0" @onclick="@(e => RrKim(e, X.Value))">@X.Value.ToString("#")</span>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
 
 }
 
 
 <DxPopup HeaderText="@RrInfoHdr"
-				 @bind-Visible="@PopupVisible">
-		<Content>
-				<p>@((MarkupString)RrInfoContetnt)</p>
-		</Content>
+         @bind-Visible="@PopupVisible">
+    <Content>
+        <p>@((MarkupString)RrInfoContetnt)</p>
+    </Content>
 </DxPopup>
 
 @code {
-		private int AaID { get; set; }
-		private int UuID { get; set; }
+    private int AaID { get; set; }
+    private int UuID { get; set; }
 
-		bool PopupVisible { get; set; } = false;
-		string RrInfoHdr = "";
-		string RrInfoContetnt = "";
+    string TalepMsjClass = "";
 
-		Dictionary<int, RRdrm2ViewModel> dataView = new Dictionary<int, RRdrm2ViewModel>();
-		List<RRdrm2HdrModel> dataHdr;
-		List<string> dataBasZmn;
-		List<KKmodel> dataKK;
+    bool PopupVisible { get; set; } = false;
+    string RrInfoHdr = "";
+    string RrInfoContetnt = "";
 
-		int DimX = 0;
-		int DimY = 0;
+    Dictionary<int, RRdrm2ViewModel> dataView = new Dictionary<int, RRdrm2ViewModel>();
+    List<RRdrm2HdrModel> dataHdr;
+    List<string> dataBasZmn;
+    List<KKmodel> dataKK;
 
-		//DateTime? iTrh;
-		bool TalepEnabled = true;
-		string TalepMsj = "";
-		int TalepRrID = 0;
-		string usrSkl = "";
-		bool usrRrOK = false;
+    int DimX = 0;
+    int DimY = 0;
 
-
-		DateTime trh;
-		DateTime Trh
-		{
-				get { return trh; }
-				set
-				{
-						trh = value;
-						InvokeAsync(Read);
-						InvokeAsync(StateHasChanged);
-				}
-		}
-		DateTime MinDate { get; set; }
-		DateTime MaxDate { get; set; }
-		string BasZmn { get; set; }
+    //DateTime? iTrh;
+    bool TalepEnabled = true;
+    string TalepMsj = "";
+    int TalepRrID = 0;
+    string usrSkl = "";
+    bool usrRrOK = false;
 
 
-		int KkID = 0;
-		int Sure = 60;
+    DateTime trh;
+    DateTime Trh
+    {
+        get { return trh; }
+        set
+        {
+            trh = value;
+            InvokeAsync(Read);
+            InvokeAsync(StateHasChanged);
+        }
+    }
+    DateTime MinDate { get; set; }
+    DateTime MaxDate { get; set; }
+    string BasZmn { get; set; }
 
-		private async Task RrKim(MouseEventArgs e, int vm)
-		{
-				string aaa = await db.LoadRec<string, dynamic>($"select RrInfo from RR_INFO({vm})", new { });
 
-				RrInfoHdr = $"Rezervasyon# {vm}";
-				RrInfoContetnt = aaa;
-				PopupVisible = true;
-		}
+    int KkID = 0;
+    int Sure = 60;
 
-		async Task RrTalepKort()
-		{
-				dynamic p = new
-				{
-						AaID = AaID,
-						UuID = UuID,
-						Trh = Trh,
-						ZmnTxt = BasZmn,
-						Sure = Sure,
-						KkID = KkID,
-						Info = "",
-						UuIDs = ""
-				};
+    private async Task RrKim(MouseEventArgs e, int vm)
+    {
+        string aaa = await db.LoadRec<string, dynamic>($"select RrInfo from RR_INFO({vm})", new { });
 
-				string sql = $"select * from RR_TALEP_KORT(@AaID, @UuID,  @Trh, @ZmnTxt, @Sure, @KkID, @Info, @UuIDs)";
-				RRtalepModel aaa = await db.LoadRec<RRtalepModel, dynamic>(sql, p);
+        RrInfoHdr = $"Rezervasyon# {vm}";
+        RrInfoContetnt = aaa;
+        PopupVisible = true;
+    }
 
-				TalepRrID = aaa.RrID;
-				TalepMsj = $"{aaa.Msj}";
+    async Task RrTalepKort()
+    {
+        dynamic p = new
+        {
+            AaID = AaID,
+            UuID = UuID,
+            Trh = Trh,
+            ZmnTxt = BasZmn,
+            Sure = Sure,
+            KkID = KkID,
+            Info = "",
+            UuIDs = ""
+        };
 
-				if (TalepRrID > 0)
-						await Read();
-				StateHasChanged();
+        string sql = $"select * from RR_TALEP_KORT(@AaID, @UuID,  @Trh, @ZmnTxt, @Sure, @KkID, @Info, @UuIDs)";
+        RRtalepModel aaa = await db.LoadRec<RRtalepModel, dynamic>(sql, p);
 
-				//await SendAsync();
-				await GroupSendAsync();
-		}
+        TalepRrID = aaa.RrID;
+        TalepMsj = $"{aaa.Msj}";
+        if (aaa.RrID == 0)
+            TalepMsjClass = "bg-danger text-white";
+        else
+            TalepMsjClass = "bg-success text-white";
 
-		async Task Read()
-		{
-				dynamic p = new
-				{
-						AaID = AaID,
-						UuID = UuID,
-						Trh = Trh
-				};
+        if (TalepRrID > 0)
+            await Read();
+        StateHasChanged();
 
-				string sql = $"select * from RR_DRM_HDR(@AaID, @UuID, @Trh)";
-				dataHdr = await db.LoadData<RRdrm2HdrModel, dynamic>(sql, p);
-				DimX = dataHdr.Count;
-				DimY = dataHdr[0].DimY;
+        //await SendAsync();
+        await GroupSendAsync();
+    }
 
-				sql = $"select * from RR_DRM(@AaID, @UuID, @Trh)";
-				var data = await db.LoadData<RRdrm2Model, dynamic>(sql, p);
+    async Task Read()
+    {
+        dynamic p = new
+        {
+            AaID = AaID,
+            UuID = UuID,
+            Trh = Trh
+        };
 
-				sql = $"select ZmnTxt from RR_TALEP_ZMNTXT(@AaID, @UuID, @Trh)";
-				dataBasZmn = await db.LoadData<string, dynamic>(sql, p);
+        string sql = $"select * from RR_DRM_HDR(@AaID, @UuID, @Trh)";
+        dataHdr = await db.LoadData<RRdrm2HdrModel, dynamic>(sql, p);
+        DimX = dataHdr.Count;
+        DimY = dataHdr[0].DimY;
 
-				if (string.IsNullOrEmpty(BasZmn))
-						BasZmn = dataBasZmn[0];
+        sql = $"select * from RR_DRM(@AaID, @UuID, @Trh)";
+        var data = await db.LoadData<RRdrm2Model, dynamic>(sql, p);
 
-				RRdrm2ViewModel vm = null;
-				dataView.Clear();
-				// init dataView
-				for (int y = 0; y < DimY; y++)
-				{
-						vm = new RRdrm2ViewModel();
-						vm.RrID = new Dictionary<int, int>();
-						for (int x = 0; x < DimX; x++)
-						{
-								vm.RrID.Add(x, -1);
-						}
+        sql = $"select ZmnTxt from RR_TALEP_ZMNTXT(@AaID, @UuID, @Trh)";
+        dataBasZmn = await db.LoadData<string, dynamic>(sql, p);
 
-						dataView.Add(y, vm);
-				}
+        if (string.IsNullOrEmpty(BasZmn))
+            BasZmn = dataBasZmn[0];
 
-				foreach (var d in data)
-				{
-						dataView[d.Y].Zmn = d.Zmn;
-						dataView[d.Y].RrID[d.X] = d.RrID;
-				}
-		}
+        RRdrm2ViewModel vm = null;
+        dataView.Clear();
+        // init dataView
+        for (int y = 0; y < DimY; y++)
+        {
+            vm = new RRdrm2ViewModel();
+            vm.RrID = new Dictionary<int, int>();
+            for (int x = 0; x < DimX; x++)
+            {
+                vm.RrID.Add(x, -1);
+            }
 
-		protected override async Task OnInitializedAsync()
-		{
-				AaID = MyAppState.getAaID();
-				UuID = MyAppState.getUsrID();
-				usrSkl = MyAppState.getUsrSkl();
-				usrRrOK = MyAppState.getUsrRrOK();
+            dataView.Add(y, vm);
+        }
 
-				//var aa = await db.LoadData<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
-				//int RzrMaxGun = aa[0].RzrMaxGun;
+        foreach (var d in data)
+        {
+            dataView[d.Y].Zmn = d.Zmn;
+            dataView[d.Y].RrID[d.X] = d.RrID;
+        }
+    }
 
-				var aaRec = await db.LoadRec<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
-				int RzrMaxGun = aaRec.RzrMaxGun;
+    protected override async Task OnInitializedAsync()
+    {
+        AaID = MyAppState.getAaID();
+        UuID = MyAppState.getUsrID();
+        usrSkl = MyAppState.getUsrSkl();
+        usrRrOK = MyAppState.getUsrRrOK();
 
-				//Trh = DateTime.Today;
-				//Trh = new DateTime(2020, 12, 12, 8, 0, 0);  // 11inde kayit var onu gormek icin, simdilik
-				Trh = DateTime.Today;
-				MinDate = Trh;
-				if (usrSkl == "U")
-						MaxDate = MinDate.AddDays(RzrMaxGun);
-				else
-						MaxDate = MinDate.AddYears(1);
+        //var aa = await db.LoadData<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
+        //int RzrMaxGun = aa[0].RzrMaxGun;
 
-				dataKK = await db.LoadData<KKmodel, dynamic>($"select * from KK where AaID = {AaID}", new { });
-				KkID = dataKK[0].KkID;
+        var aaRec = await db.LoadRec<AAmodel, dynamic>($"select RzrMaxGun from AA where AaID = {AaID}", new { });
+        int RzrMaxGun = aaRec.RzrMaxGun;
 
-				string baseUrl = NavigationManager.BaseUri;
-				string _hubUrl;
-				_hubUrl = baseUrl + "DataHub";
+        //Trh = DateTime.Today;
+        //Trh = new DateTime(2020, 12, 12, 8, 0, 0);  // 11inde kayit var onu gormek icin, simdilik
+        Trh = DateTime.Today;
+        MinDate = Trh;
+        if (usrSkl == "U")
+            MaxDate = MinDate.AddDays(RzrMaxGun);
+        else
+            MaxDate = MinDate.AddYears(1);
 
-				try
-				{
-						_hubConnection = new HubConnectionBuilder()
-								.WithUrl(_hubUrl)
-								.Build();
+        dataKK = await db.LoadData<KKmodel, dynamic>($"select * from KK where AaID = {AaID}", new { });
+        KkID = dataKK[0].KkID;
 
-						//_hubConnection.On<int, DateTime>("SyncRr", BroadcastMessage);
-						_hubConnection.On<DateTime>("GroupSyncRr", BroadcastMessageGroup);
+        string baseUrl = NavigationManager.BaseUri;
+        string _hubUrl;
+        _hubUrl = baseUrl + "DataHub";
 
-						await _hubConnection.StartAsync();
-						await _hubConnection.SendAsync("AddToGroup", AaID.ToString());
+        try
+        {
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(_hubUrl)
+                .Build();
 
-				}
-				catch (Exception e)
-				{
-						Console.WriteLine($"ERROR: Failed to start hubConnection: {e.Message}");
-				}
-		}
+            //_hubConnection.On<int, DateTime>("SyncRr", BroadcastMessage);
+            _hubConnection.On<DateTime>("GroupSyncRr", BroadcastMessageGroup);
 
-		HubConnection _hubConnection;
+            await _hubConnection.StartAsync();
+            await _hubConnection.SendAsync("AddToGroup", AaID.ToString());
 
-		private void BroadcastMessage(int aaID, DateTime trh)
-		{
-				if (aaID == AaID && trh == Trh)
-				{
-						InvokeAsync(Read);
-						// Inform blazor the UI needs updating
-						StateHasChanged();
-				}
-		}
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"ERROR: Failed to start hubConnection: {e.Message}");
+        }
+    }
 
-		private void BroadcastMessageGroup(DateTime trh)
-		{
-				if (trh == Trh)
-				{
-						InvokeAsync(Read);
-						// Inform blazor the UI needs updating
-						StateHasChanged();
-				}
-		}
+    HubConnection _hubConnection;
 
-		private async Task SendAsync()
-		{
-				if (_hubConnection != null)
-				{
-						await _hubConnection.SendAsync("SyncRr", AaID, Trh);
+    private void BroadcastMessage(int aaID, DateTime trh)
+    {
+        if (aaID == AaID && trh == Trh)
+        {
+            InvokeAsync(Read);
+            // Inform blazor the UI needs updating
+            StateHasChanged();
+        }
+    }
 
-				}
-		}
+    private void BroadcastMessageGroup(DateTime trh)
+    {
+        if (trh == Trh)
+        {
+            InvokeAsync(Read);
+            // Inform blazor the UI needs updating
+            StateHasChanged();
+        }
+    }
 
-		private async Task GroupSendAsync()
-		{
-				if (_hubConnection != null)
-				{
-						await _hubConnection.SendAsync("GroupSyncRr", AaID.ToString(), Trh);
+    private async Task SendAsync()
+    {
+        if (_hubConnection != null)
+        {
+            await _hubConnection.SendAsync("SyncRr", AaID, Trh);
 
-				}
-		}
-		private async Task DisconnectAsync()
-		{
-				if (_hubConnection != null)
-				{
-						//await SendAsync($"[Notice] {_username} left chat room.");
+        }
+    }
 
-						await _hubConnection.SendAsync("RemoveFromGroup", AaID.ToString());
-						await _hubConnection.StopAsync();
-						await _hubConnection.DisposeAsync();
+    private async Task GroupSendAsync()
+    {
+        if (_hubConnection != null)
+        {
+            await _hubConnection.SendAsync("GroupSyncRr", AaID.ToString(), Trh);
 
-						_hubConnection = null;
-				}
-		}
+        }
+    }
+    private async Task DisconnectAsync()
+    {
+        if (_hubConnection != null)
+        {
+            //await SendAsync($"[Notice] {_username} left chat room.");
 
-		public void Dispose()
-		{
-				InvokeAsync(DisconnectAsync);
-		}
+            await _hubConnection.SendAsync("RemoveFromGroup", AaID.ToString());
+            await _hubConnection.StopAsync();
+            await _hubConnection.DisposeAsync();
+
+            _hubConnection = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        InvokeAsync(DisconnectAsync);
+    }
 
 }
