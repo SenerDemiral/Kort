@@ -55,16 +55,24 @@
 													Caption="Kort"
 													AllowGroup="true" />
 				<DxDataGridDateEditColumn Field=@nameof(RrRprModel.BasTrh)
-													Caption="Tarih"
-													TextAlignment="DataGridTextAlign.Center"
-						  						DisplayFormat="HH:mm"
-													AllowGroup="true" />
+																	Caption="Tarih"
+																	TextAlignment="DataGridTextAlign.Center"
+																	DisplayFormat="HH:mm"
+																	AllowGroup="true" />
 				<DxDataGridColumn Field=@nameof(RrRprModel.Sure)
 													Caption="Süre"
 													TextAlignment="DataGridTextAlign.Center"
 													AllowGroup="true" />
+				<DxDataGridColumn Field=@nameof(RrRprModel.UuSkl)
+													Caption="DznŞkl"
+													TextAlignment="DataGridTextAlign.Center"
+													AllowGroup="true" />
 				<DxDataGridColumn Field=@nameof(RrRprModel.UuAd)
 													Caption="Düzenleyen"
+													AllowGroup="true" />
+				<DxDataGridColumn Field=@nameof(RrRprModel.OySkl)
+													Caption="OynŞkl"
+													TextAlignment="DataGridTextAlign.Center"
 													AllowGroup="true" />
 				<DxDataGridColumn Field=@nameof(RrRprModel.OyAd)
 													Caption="Oyuncu"
@@ -115,5 +123,6 @@
 				string sql = $"select * from RR_RPR(@AaID, @Trh)";
 				data = await db.LoadData<RrRprModel, dynamic>(sql, p);
 		}
+
 
 }

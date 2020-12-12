@@ -13,8 +13,10 @@ namespace DataLibrary.Models
         public DateTime BasTrh { get; set; }
         public int Sure { get; set; }
         public int UuID { get; set; }
+        public string UuSkl { get; set; }
         public string UuAd { get; set; }
         public int OyID { get; set; }
+        public string OySkl { get; set; }
         public string OyAd { get; set; }
 
     }

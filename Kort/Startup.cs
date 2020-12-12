@@ -31,6 +31,7 @@ namespace Kort
             services.AddMvc(options => options.EnableEndpointRouting = false)
                         .SetCompatibilityVersion(CompatibilityVersion.Version_3_0); // ----Controller
 
+            services.AddSignalR();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
@@ -65,6 +66,7 @@ namespace Kort
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
+                endpoints.MapHub<Hubs.DataHub>("/DataHub");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
