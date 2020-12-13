@@ -37,6 +37,7 @@ namespace Kort
             services.AddSingleton<WeatherForecastService>();
 
             services.AddSingleton<IDataAccess>(s => new DataAccess(connString));
+            services.AddSingleton<MySingletonState>();
             services.AddScoped<MyAppState>();
             services.AddTransient<IMailService, MailService>();
 

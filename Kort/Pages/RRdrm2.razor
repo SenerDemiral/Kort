@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IDataAccess db
 @inject MyAppState MyAppState
+@inject MySingletonState MySingletonState
 @using Microsoft.AspNetCore.SignalR.Client
 @implements IDisposable
 @*@implements IAsyncDisposable*@
@@ -128,6 +129,8 @@
     private int AaID { get; set; }
     private int UuID { get; set; }
 
+    private Guid Guid;
+
     string TalepMsjClass = "";
 
     bool PopupVisible { get; set; } = false;
@@ -197,17 +200,18 @@
 
         TalepRrID = aaa.RrID;
         TalepMsj = $"{aaa.Msj}";
-        if (aaa.RrID == 0)
-            TalepMsjClass = "bg-danger text-white";
-        else
+        if (aaa.RrID > 0)
             TalepMsjClass = "bg-success text-white";
+        else
+            TalepMsjClass = "bg-danger text-white";
 
         if (TalepRrID > 0)
             await Read();
         StateHasChanged();
 
         //await SendAsync();
-        await GroupSendAsync();
+        //await GroupSendAsync();
+        MySingletonState.RrChange(Guid, AaID, Trh);
     }
 
     async Task Read()
@@ -280,26 +284,39 @@
         dataKK = await db.LoadData<KKmodel, dynamic>($"select * from KK where AaID = {AaID}", new { });
         KkID = dataKK[0].KkID;
 
-        string baseUrl = NavigationManager.BaseUri;
-        string _hubUrl;
-        _hubUrl = baseUrl + "DataHub";
+        //string baseUrl = NavigationManager.BaseUri;
+        //string _hubUrl;
+        //_hubUrl = baseUrl + "DataHub";
 
-        try
+        //try
+        //{
+        //    _hubConnection = new HubConnectionBuilder()
+        //        .WithUrl(_hubUrl)
+        //        .Build();
+
+        //    //_hubConnection.On<int, DateTime>("SyncRr", BroadcastMessage);
+        //    _hubConnection.On<DateTime>("GroupSyncRr", BroadcastMessageGroup);
+
+        //    await _hubConnection.StartAsync();
+        //    await _hubConnection.SendAsync("AddToGroup", AaID.ToString());
+
+        //}
+        //catch (Exception e)
+        //{
+        //    Console.WriteLine($"ERROR: Failed to start hubConnection: {e.Message}");
+        //}
+
+        Guid = Guid.NewGuid();
+        MySingletonState.RrChanged += RrChanged;
+    }
+
+    private void RrChanged(object Sender, RrChangedEventArgs e)
+    {
+        if (e.Guid != Guid && e.Trh == Trh && e.AaID == AaID) // Degistiren degilse ve Ayni yerdelerse
         {
-            _hubConnection = new HubConnectionBuilder()
-                .WithUrl(_hubUrl)
-                .Build();
-
-            //_hubConnection.On<int, DateTime>("SyncRr", BroadcastMessage);
-            _hubConnection.On<DateTime>("GroupSyncRr", BroadcastMessageGroup);
-
-            await _hubConnection.StartAsync();
-            await _hubConnection.SendAsync("AddToGroup", AaID.ToString());
-
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"ERROR: Failed to start hubConnection: {e.Message}");
+            InvokeAsync(Read);
+            Task.Delay(1);
+            InvokeAsync(StateHasChanged);
         }
     }
 
@@ -358,6 +375,7 @@
 
     public void Dispose()
     {
+        MySingletonState.RrChanged -= RrChanged;
         InvokeAsync(DisconnectAsync);
     }
 
